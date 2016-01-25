@@ -1,0 +1,9 @@
+{
+  "custom": {
+    "server": ""
+  },
+  "server": {
+    "log": "brorig.log",
+    "data_path": "data/"
+  }
+}

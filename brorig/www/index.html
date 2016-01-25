@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+
+{% block jshead %}
+<script src="{{ static_url('js/src/app/app.js') }}"></script>
+<script src="{{ static_url('js/src/app/alert.controller.js') }}"></script>
+<script src="{{ static_url('js/src/app/loading.controller.js') }}"></script>
+<script src="{{ static_url('js/src/app/main-tool-bar.controller.js') }}"></script>
+<script src="{{ static_url('js/src/app/page.service.js') }}"></script>
+<script src="{{ static_url('js/src/app/server-config.controller.js') }}"></script>
+<script src="{{ static_url('js/src/app/server-config.service.js') }}"></script>
+<script src="{{ static_url('js/src/app/server-selector.controller.js') }}"></script>
+<script src="{{ static_url('js/src/app/server-selector.service.js') }}"></script>
+
+<script src="{{ static_url('js/src/graph/graph.js') }}"></script>
+<script src="{{ static_url('js/src/graph/display-info.controller.js') }}"></script>
+<script src="{{ static_url('js/src/graph/display-info.directive.js') }}"></script>
+<script src="{{ static_url('js/src/graph/graph.controller.js') }}"></script>
+<script src="{{ static_url('js/src/graph/manager.service.js') }}"></script>
+<script src="{{ static_url('js/src/graph/network.directive.js') }}"></script>
+<script src="{{ static_url('js/src/graph/setting.controller.js') }}"></script>
+<script src="{{ static_url('js/src/graph/setting.service.js') }}"></script>
+<script src="{{ static_url('js/src/graph/timeline.directive.js') }}"></script>
+
+{% for js_file in custom_head["js"] %}
+<link rel="stylesheet" type="text/css" href="{{ js_file }}">
+{% end %}
+
+{% end %}
+
+{% block csshead %}
+
+{% for css_file in custom_head["css"] %}
+<link rel="stylesheet" type="text/css" href="{{ css_file }}">
+{% end %}
+
+{% end %}
+
+
+{% block body %}
+<div id="loading" ng-controller="LoadingController as loading" ng-show="loading.show()"></div>
+<div id="alert" ng-controller="AlertController as alert" ng-show="alert.show()" ng-class="[alert.class()]">
+    <span>{{!alert.txt()}}</span>
+    <button ng-click="alert.close()">OK</button>
+</div>
+
+{% include "section/mainbar.html" %}
+{% include "section/sniffer_config.html" %}
+{% include "section/server_selector.html" %}
+{% include "section/graph.html" %}
+
+{% end %}

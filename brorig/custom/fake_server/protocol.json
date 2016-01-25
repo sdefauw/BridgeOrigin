@@ -1,0 +1,25 @@
+{
+ "fakepacket": {
+   "name": "Fake Packet",
+   "desc": ":)",
+   "color": "#00ff00",
+   "filter": ["cat.0", "cat.1"],
+   "category": {
+     "cat.0": {
+       "name": "cat 0",
+       "desc": "category 0",
+       "color": "#ffff00"
+     },
+     "cat.1": {
+       "name": "cat 1",
+       "desc": "category 1",
+       "color": "#00ffff"
+     },
+     "cat.2": {
+       "name": "cat 2",
+       "desc": "category 2",
+       "color": "#ff00ff"
+     }
+   }
+ }
+}

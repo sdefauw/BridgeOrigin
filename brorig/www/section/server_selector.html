@@ -1,0 +1,20 @@
+<div ng-controller="ServerSelectorController as serverselector" ng-show="serverselector.display()" class="selectbox">
+    <img src="{{ static_url('img/x.svg') }}" ng-click="serverselector.close()" class="close"/>
+    <input type="text" ng-model="searchkeys" placeholder="Search" name="searchkeys" ng-keyup="serverselector.search()"
+           id="search"/>
+    <span>Select servers to monitor</span>
+
+    <div class="select_content">
+        <ul>
+            <li ng-repeat="server in serverselector.servers()">
+                <a ng-click="serverselector.select(server)" ng-class="{selected: server.selected}">
+                    <span>{{!server.key}}</span>
+                    {{!server.name}} - {{!server.group}}
+                </a>
+            </li>
+        </ul>
+    </div>
+    <select ng-model="tfilter" ng-options="opt as opt.label for opt in serverselector.tFilterOptions">
+    </select>
+    <button ng-click="serverselector.process()" style="width: 100px;float: right;margin: 5px;">Process</button>
+</div>

@@ -1,0 +1,22 @@
+<div class="section">
+    <h1>Settings</h1>
+
+    <div class="subsection" ng-repeat="(protocol, filter) in sc.filtersAvailable()">
+        <h2 class="title">{{!filter.name }} ({{!filter.desc}})</h2>
+        <ul class="filterbox">
+            <li ng-repeat="regex in filter.selected" title="{{!filter.category[regex].desc}}">
+                <img src="{{ static_url('img/x.svg') }}" ng-click="sc.rmProtocol(protocol, regex)"/>
+                <span ng-show="filter.category[regex]">{{!filter.category[regex].name}}</span>
+                <span ng-show="!filter.category[regex]">{{!regex}}</span>
+            </li>
+        </ul>
+        <form ng-submit="sc.addProtocol(protocol)">
+            <input type="text" ng-model="sc.adder[protocol]" placeholder="Add category" list="autoCompleted"
+                   name="sipAdder"/>
+            <datalist id="autoCompleted">
+                <option ng-repeat="(regex, data) in filter.category" value="{{!data.name}}">{{!data.name}}
+                </option>
+            </datalist>
+        </form>
+    </div>
+</div>

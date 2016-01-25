@@ -1,0 +1,30 @@
+<div ng-show="packet">
+    <h1>Packet</h1>
+    <table>
+        <tr>
+            <td>Protocol</td>
+            <td class='data'>{{!packet.protocol}}</td>
+        </tr>
+        <tr>
+            <td>Category</td>
+            <td class='data'>{{!packet.category}}</td>
+        </tr>
+        <tr>
+            <td>Start time</td>
+            <td class="data">{{!packet.start | date:'EEE, MMM d, y HH:mm:ss.sss'}}</td>
+        </tr>
+        <tr>
+            <td>Recv time</td>
+            <td class="data">{{!packet.end | date:'EEE, MMM d, y HH:mm:ss.sss'}}</td>
+        </tr>
+        <tr>
+            <td>Status</td>
+            <td class="data">{{!packet.status}}</td>
+        </tr>
+        <tr>
+            <td colspan="2">
+                <div display-info-detail uuid="packet.uuid" class="detail"></div>
+            </td>
+        </tr>
+    </table>
+</div>

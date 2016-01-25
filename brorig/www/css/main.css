@@ -1,0 +1,469 @@
+
+body {
+    -webkit-font-smoothing: antialiased;
+    font-family: "Helvetica Neue", sans-serif;
+    font-size: 12px;
+    font-weight: 200;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    letter-spacing: .5px;
+}
+
+ul, li, a,
+h1, h2, h3 {
+    text-decoration: none;
+    padding: 0;
+    margin: 0;
+}
+
+a {
+    cursor: pointer;
+    color: rgb(150, 150, 150);
+}
+
+a:hover {
+    color: rgba(0, 204, 255, .75);
+}
+
+button,
+.button {
+    cursor: pointer;
+    background: none;
+    border: 1px solid rgb(200, 200, 200);
+    text-align: center;
+    vertical-align: middle;
+    font-size: 12px;
+    color: rgb(150, 150, 150);
+    border-radius: 10px;
+}
+
+button:hover,
+.button:hover,
+button:focus,
+.button:focus {
+    transition: 0.2s cubic-bezier(0, 0, 0.3, 1);
+    transition-property: color, border-color;
+    border-color: rgba(0, 204, 255, .75);
+    color: rgba(0, 204, 255, .75);
+    outline: none;
+}
+
+#loading {
+    display: block;
+    width: 50px;
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    padding: 2px;
+    height: 50px;
+    margin: -25px 0 0 -25px;
+}
+
+#loading img {
+    float: left;
+    display: block;
+    margin: 2px 7px;
+}
+
+#loading span {
+    color: #fff;
+    display: block;
+    margin-left: 30px;
+    line-height: 20px;
+    vertical-align: middle;
+}
+
+#alert {
+    display: block;
+    width: 300px;
+    position: absolute;
+    top: -1px;
+    left: 50%;
+    margin-left: -170px;
+    color: #fff;
+    padding: 8px 20px;
+}
+
+#alert.error {
+    background: rgba(255, 0, 0, 0.5);
+    border: 1px solid rgba(255, 0, 0, 0.75);
+}
+
+#alert.warning {
+    background: rgba(255, 150, 0, .5);
+    border: 1px solid rgba(255, 150, 0, .75);
+}
+
+#alert.info {
+    background: rgba(0, 204, 255, .5);
+    border-color: rgba(0, 204, 255, .75);
+}
+
+#alert span {
+    font-weight: 400;
+    display: block;
+}
+
+#alert button {
+    float: right;
+    color: #fff;
+    border-color: rgba(255, 255, 255, .9);
+    color: rgba(255, 255, 255, .9);
+}
+
+#alert button:hover,
+#alert button:focus {
+    border-color: rgba(255, 255, 255, .5);
+    color: rgba(255, 255, 255, .5);
+}
+
+.tool {
+    position: absolute;
+    height: 35px;
+    background: rgba(0, 204, 255, .5);
+    top: -1px;
+    left: -1px;
+    width: 300px;
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    justify-content: space-around;
+}
+
+.tool li {
+}
+
+.tool li a {
+    display: block;
+    line-height: 35px;
+    padding: 0 10px;
+    font-size: 13px;
+    color: rgb(255, 255, 255);
+    vertical-align: middle;
+}
+
+.tool li a:hover {
+    transition: opacity 0.2s cubic-bezier(0, 0, 0.3, 1);
+    opacity: .8;
+}
+
+.network .node rect {
+    cursor: pointer;
+    fill-opacity: .75;
+    stroke-width: 1px;
+}
+
+.network .node text {
+    font-size: 14px;
+    pointer-events: none;
+    text-anchor: middle;
+    fill: #fff;
+}
+
+.network path {
+    fill: none;
+    stroke: #999;
+    stroke-width: 1px;
+    stroke-opacity: .6;
+    marker-end: url(#suit);
+}
+
+svg.timeline {
+    font-size: 10px;
+    shape-rendering: crispEdges;
+}
+
+.timeline rect {
+    fill-opacity: .3;
+    stroke-opacity: .6;
+}
+
+.timeline .axis path,
+.timeline .axis line {
+    fill: none;
+    stroke: rgb(230, 230, 230);
+}
+
+.boxpannel,
+.selectbox,
+#displayinfo {
+    background: rgba(255, 255, 255, .9);
+    box-shadow: 0 1px 4px 0 rgba(0, 0, 0, 0.2);
+    border: solid 1px rgb(215, 215, 215);
+    display: block;
+    position: absolute;
+    right: 0;
+    top: 0;
+    padding: 5px;
+    margin: 5px 10px;
+    text-align: left;
+    min-height: 20px;
+    min-width: 150px;
+    color: rgb(150, 150, 150);
+    font-size: 12px;
+}
+
+#displayinfo h1 {
+    display: block;
+    margin: 0;
+    padding: 5px;
+    text-align: center;
+    font-weight: 300;
+    font-size: 18px;
+}
+
+#displayinfo table td {
+    padding: 3px 0;
+}
+
+#displayinfo table td.data {
+    color: #666;
+    padding-left: 5px;
+}
+
+#displayinfo pre {
+    font-size: 10px;
+    letter-spacing: 0;
+}
+
+#displayinfo .detail {
+    max-height: 500px;
+    overflow-y: auto;
+}
+
+.selectbox {
+    display: block;
+    position: absolute;
+    padding: 10px;
+    width: 400px;
+    height: 450px;
+    margin: -200px 0 0 -225px;
+    text-align: left;
+    min-height: 20px;
+    min-width: 150px;
+    color: rgb(150, 150, 150);
+    top: 50%;
+    left: 50%;
+}
+
+#displayinfo .close,
+.selectbox .close {
+    display: block;
+    float: right;
+    color: rgb(200, 200, 200);
+    text-decoration: none;
+    cursor: pointer;
+    height: 9px;
+}
+
+.selectbox select {
+    display: block;
+    background: none;
+    border: 1px solid rgb(200, 200, 200);
+    font-size: 12px;
+    color: rgb(150, 150, 150);
+    margin: 5px;
+    float: left;
+    height: 20px;
+}
+
+.selectbox select:focus,
+.selectbox select:hover {
+    border-color: rgba(0, 204, 255, .75);
+    color: rgba(0, 204, 255, .75);
+    outline: none;
+}
+
+.selectbox .select_content {
+    display: block;
+    height: 400px;
+    overflow-y: scroll;
+    margin: 10px 5px 0 5px;
+}
+
+.selectbox .select_content ul,
+.selectbox .select_content ul li {
+    display: block;
+    padding: 0;
+    margin: 0;
+}
+
+.selectbox .select_content ul li a {
+    display: block;
+    border-bottom: solid 1px rgb(200, 200, 200);
+    text-decoration: none;
+    color: rgb(150, 150, 150);
+    padding: 5px 10px;
+}
+
+.selectbox .select_content ul li a:hover {
+    background-color: rgba(200, 200, 200, .1);
+}
+
+.selectbox .select_content ul li a.selected {
+    background-color: rgba(0, 204, 255, .1);
+}
+
+.selectbox .select_content ul li a span {
+    display: block;
+    float: right;
+}
+
+.selectbox input {
+    padding: 0 10px;
+    color: rgb(150, 150, 150);
+    border: solid 1px rgba(200, 200, 200, .5);
+    height: 20px;
+    width: 125px;
+    border-radius: 10px;
+    background: none;
+}
+
+.selectbox input:hover,
+.selectbox input:focus {
+    border-color: rgba(0, 204, 255, .75);
+    outline: none;
+}
+
+.selectbox #search {
+    display: block;
+    float: right;
+    margin-right: 20px;
+    width: 50px;
+}
+
+.selectbox #search:focus {
+    width: 150px;
+}
+
+#gsetting {
+    width: 600px;
+    height: 300px;
+    margin: -150px 0 0 -300px;
+}
+
+#gsetting h1,
+#gsetting h2,
+#gsetting h3 {
+    font-weight: 200;
+    display: block;
+}
+
+#gsetting h1 {
+    font-size: 15px;
+    text-align: center;
+    margin: 5px;
+}
+
+#gsetting h2 {
+    font-size: 13px;
+    margin: 5px 0;
+}
+
+#gsetting ul.filterbox {
+    display: block;
+    overflow: auto;
+    max-height: 200px;
+}
+
+#gsetting ul.filterbox li {
+    display: block;
+    float: left;
+    border: solid 1px rgba(200, 200, 200, .5);
+    margin: 3px 5px;
+}
+
+#gsetting ul.filterbox li span {
+    display: block;
+    color: rgb(150, 150, 150);
+    line-height: 20px;
+    text-align: center;
+    vertical-align: middle;
+    padding: 0 15px;
+    cursor: default;
+}
+
+#gsetting ul.filterbox li img {
+    display: none;
+    float: right;
+    cursor: pointer;
+    margin: 6px 3px;
+    height: 7px;
+}
+
+#gsetting ul.filterbox li:hover span {
+    padding: 0 20px 0 10px;
+}
+
+#gsetting ul.filterbox li:hover img {
+    display: block;
+}
+
+#gsetting input {
+    display: block;
+    padding: 0 10px;
+    color: rgb(150, 150, 150);
+    border: solid 1px rgba(200, 200, 200, .5);
+    height: 20px;
+    width: 125px;
+    margin: 5px auto;
+    border-radius: 10px;
+    background: none;
+}
+
+#gsetting input:hover,
+#gsetting input:focus {
+    border-color: rgba(0, 204, 255, .75);
+    outline: none;
+}
+
+#server-config {
+    width: 300px;
+    height: 130px;
+    margin: -65px 0 0 -150px;
+}
+
+#server-config ul {
+    display: block;
+    margin-top: 15px;
+}
+
+#server-config ul li {
+    display: block;
+    margin: 10px 0;
+}
+
+#server-config ul li img {
+    display: block;
+    float: left;
+    height: 15px;
+    margin: 15px 10px;
+}
+
+#server-config ul li a {
+    display: block;
+    height: 50px;
+}
+
+#server-config ul li a:hover {
+    color: inherit;
+    transition: opacity 0.2s cubic-bezier(0, 0, 0.3, 1);
+    opacity: .7;
+}
+
+#server-config ul li a svg {
+    display: block;
+    float: left;
+}
+
+#server-config ul li a h1 {
+    font-size: 14px;
+    margin-left: 55px;
+}
+
+#server-config ul li a span {
+    display: block;
+    margin-left: 55px
+}

@@ -1,0 +1,24 @@
+{
+  "name": "brorig",
+  "description": "Bridge Origin is a tool to unify network traces and log files.",
+  "main": "index.html",
+  "moduleType": [],
+  "keywords": [
+    "acdb"
+  ],
+  "homepage": "",
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "js/libs",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "angular": "angularjs#~1.4.8",
+    "d3": "~3.5.10",
+    "angular-websocket": "~1.0.14"
+  }
+}

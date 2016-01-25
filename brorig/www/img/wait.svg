@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:a="http://ns.adobe.com/AdobeSVGViewerExtensions/3.0/" x="0px" y="0px" width="46px" height="20px" viewBox="0 0 46 20" enable-background="new 0 0 46 20" xml:space="preserve">
+    <defs>
+    </defs>
+
+<circle fill="none" stroke-width="1" stroke-miterlimit="10" cx="10" cy="10" r="4" >
+<animate
+    attributeName="stroke"  
+    begin="0s"  
+    dur="1s"  
+    values ="#969696; #fff; #fff;"
+    repeatCount="indefinite"   
+    />  
+</circle>
+
+<circle fill="none" stroke-width="1" stroke-miterlimit="10" cx="23" cy="10" r="4" >
+<animate
+    attributeName="stroke"  
+    begin="0s"  
+    dur="1s"  
+    values ="#fff; #969696; #fff;"
+    repeatCount="indefinite"   
+    />  
+</circle>
+
+<circle fill="none" stroke-width="1" stroke-miterlimit="10" cx="36" cy="10" r="4" >
+ <animate
+    attributeName="stroke"  
+    begin="0s"  
+    dur="1s"  
+    values ="#fff; #fff; #969696;"
+    repeatCount="indefinite"   
+    />  
+</circle>
+
+</svg>

@@ -1,0 +1,28 @@
+<div ng-controller="GraphController as gc" ng-init="load()">
+
+    <div network-graph data="get_data('network')" width="getWidth()" height="getHeight('network')"
+         selected-node="setNode(node)"></div>
+
+    <img src="{{ static_url('img/setting.svg') }}"
+         style="display: block; position: absolute; right: 0; height: 15px; cursor: pointer;"
+         ng-show="display('timeline')" ng-click="showSetting()"/>
+
+    <div timeline-graph display="display('timeline')" width="getWidth()" height="getHeight('timeline')" height-lane="20"
+         selected-time="" selected-data="displayDataPacket(data)" filter="filter()"
+         data="get_data('timeline').packets"></div>
+
+
+    <section id="displayinfo" ng-controller="DisplayInfoController as dic" ng-show="dic.show()">
+        <img src="{{ static_url('img/x.svg') }}" ng-click="dic.close()" ng-show="panel_fixed()" class="close"/>
+
+        {% include "graph/display/node.html" %}
+        {% include "graph/display/packet.html" %}
+
+    </section>
+
+    <div class="selectbox" id="gsetting" ng-controller="SettingController as sc" ng-show="sc.show()">
+        <img src="{{ static_url('img/x.svg') }}" ng-click="showSetting()" class="close"/>
+
+        {% include "graph/timeline/options.html" %}
+    </div>
+</div>
