@@ -13,7 +13,7 @@
         var displayNode;
         var filter = [];
 
-        var margin = {top: 20, right: 0, bottom: 10, left: 0};
+        var margin = {top: 0, right: 0, bottom: 10, left: 0};
 
         var x, y, xAxis, svg, svgg, itemRects;
         var listener = {rect: {}, loaded: null};
@@ -205,9 +205,9 @@
             if(!x)
                 x = d3.time.scale()
                     .domain(domain)
-                    .range([0, width - titleWidth]);
+                    .range([0, width]);
             else
-                x.range([0, width - titleWidth]);
+                x.range([0, width]);
 
             y = d3.scale.linear()
                 .domain([0, lanesLength])
@@ -251,13 +251,12 @@
 
             // Graph items
             var graph = svgg.append("g")
-                .attr("transform", "translate(" + titleWidth + ",0)")
                 .attr("class", "graphGroup");
 
             graph.append("defs").append("clipPath")
                 .attr("id", "clip")
                 .append("rect")
-                .attr("width", width - titleWidth)
+                .attr("width", width)
                 .attr("height", height);
 
             graph.append("g")
@@ -285,7 +284,22 @@
                 .attr("y", 0)
                 .attr("width", titleWidth)
                 .attr("height", height + 10)
-                .attr("style", "fill:#000; fill-opacity:.02;");
+                .attr("style", "fill:rgb(250,250,250); fill-opacity:.8;");
+
+            title.append("g")
+                .attr("class", "backgroundLines")
+                .selectAll(".laneLines")
+                .data(displayNode)
+                .enter().append("rect")
+                .attr("x", 0)
+                .attr("y", function (d, i) {
+                    return y(i);
+                })
+                .attr("width", titleWidth)
+                .attr("height", y(1))
+                .attr("fill", function (d, i) {
+                    return i % 2 == 0 ? "rgb(230,230,230)" : "rgb(255,255,255)";
+                });
 
             title.append("line")
                 .attr("x1", titleWidth)
