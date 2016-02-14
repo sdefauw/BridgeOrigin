@@ -1,5 +1,8 @@
-<div class="section">
-    <h1>Settings</h1>
+<div class="section filter">
+    <nav>
+        <a>Search</a>
+        <a>Filter</a>
+    </nav>
 
     <div class="subsection" ng-repeat="(protocol, filter) in sc.filtersAvailable()">
         <h2 class="title">{{!filter.name }} ({{!filter.desc}})</h2>
