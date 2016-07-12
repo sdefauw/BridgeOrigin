@@ -22,7 +22,7 @@ sudo pip install dist/*.tar.gz
 
 
 ## Configuration
-Before executing the program, you need to provide some additional information via a configuration file. The program can have multiple configuration files. This file will be taken during the [execution](#exection). For example, you can generate one file per provider network.
+Before executing the program, you need to provide some additional information via a configuration file. The program can have multiple configuration files. This file will be taken during the [execution](#execution). For example, you can generate one file per provider network.
 
 The first step is to generate an empty configuration file.
 ```
