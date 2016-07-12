@@ -32,10 +32,18 @@ clientsList = None
 
 class MainHandler(tornado.web.RequestHandler):
     def get(self):
-        self.render("index.html", custom_head={
-            "css": ["custom/" + f for f in os.listdir(os.path.join(custom.dir, "www")) if f.endswith(".css")],
-            "js": ["custom/" + f for f in os.listdir(os.path.join(custom.dir, "www")) if f.endswith(".js")]
-        })
+        custom_head = {
+            "css": [],
+            "js": []
+        }
+        dir_path = os.path.join(custom.dir, "www")
+        if os.path.exists(dir_path):
+            dir_www = os.listdir(dir_path)
+            custom_head={
+                "css": ["custom/" + f for f in dir_www if f.endswith(".css")],
+                "js": ["custom/" + f for f in dir_www if f.endswith(".js")]
+            }
+        self.render("index.html", custom_head=custom_head)
 
 
 class NoCacheStaticFileHandler(tornado.web.StaticFileHandler):

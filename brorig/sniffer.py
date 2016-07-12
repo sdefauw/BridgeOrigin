@@ -37,13 +37,13 @@ class Packet:
         self.uuid = base64.b32encode(uuid.uuid4().bytes)[:26]
         self.correlate_key = None
 
-    def set_src(self, server, time):
+    def set_src(self, server, time=None):
         self.src = {
             "server": server,
             "time": time
         }
 
-    def set_dst(self, server, time):
+    def set_dst(self, server, time=None):
         self.dst = {
             "server": server,
             "time": time

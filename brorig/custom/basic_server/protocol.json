@@ -1,0 +1,43 @@
+{
+  "HTTP": {
+    "name": "HTTP",
+    "desc": "Hypertext Transfer Protocol",
+    "color": "#00ff00",
+    "filter":[
+      "GET", "PUT",
+      "1[0-9]{2}", "2[0-9]{2}", "3[0-9]{2}", "4[0-9]{2}", "5[0-9]{2}"
+    ],
+    "category": {
+      "GET" : {
+        "name": "GET",
+        "desc": "GET",
+        "color": "#ff9600"
+      },
+      "POST" : {
+        "name": "POST",
+        "desc": "POST",
+        "color": "#00ccff"
+      },
+      "1[0-9]{2}": {
+        "name": "1xx",
+        "desc": "Provisional Responses"
+      },
+      "2[0-9]{2}": {
+        "name": "2xx",
+        "desc": "Successful Responses"
+      },
+      "3[0-9]{2}": {
+        "name": "3xx",
+        "desc": "Redirection Responses"
+      },
+      "4[0-9]{2}": {
+        "name": "4xx",
+        "desc": "Client Failure Responses"
+      },
+      "5[0-9]{2}": {
+        "name": "5xx",
+        "desc": "Server Failure Responses"
+      }
+    }
+  }
+}
