@@ -1,29 +1,29 @@
-<div ng-show="packet">
+<div ng-show="gc.packet()">
     <h1>Packet</h1>
     <table>
         <tr>
             <td>Protocol</td>
-            <td class='data'>{{!packet.protocol}}</td>
+            <td class='data'>{{!gc.packet().protocol}}</td>
         </tr>
         <tr>
             <td>Category</td>
-            <td class='data'>{{!packet.category}}</td>
+            <td class='data'>{{!gc.packet().category}}</td>
         </tr>
         <tr>
             <td>Start time</td>
-            <td class="data">{{!packet.start | date:'EEE, MMM d, y HH:mm:ss.sss'}}</td>
+            <td class="data">{{!gc.packet().start | date:'EEE, MMM d, y HH:mm:ss.sss'}}</td>
         </tr>
         <tr>
             <td>Recv time</td>
-            <td class="data">{{!packet.end | date:'EEE, MMM d, y HH:mm:ss.sss'}}</td>
+            <td class="data">{{!gc.packet().end | date:'EEE, MMM d, y HH:mm:ss.sss'}}</td>
         </tr>
         <tr>
             <td>Status</td>
-            <td class="data">{{!packet.status}}</td>
+            <td class="data">{{!gc.packet().status}}</td>
         </tr>
         <tr>
             <td colspan="2">
-                <div display-info-detail uuid="packet.uuid" class="detail"></div>
+                <div display-info-detail uuid="gc.packet().uuid" class="detail"></div>
             </td>
         </tr>
     </table>

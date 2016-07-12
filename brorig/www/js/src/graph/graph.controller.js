@@ -2,81 +2,94 @@
 
     angular.module('graph')
         .controller('GraphController', [
-            '$scope', '$window', "$http", "$timeout",
+            '$window', "$http", "$timeout",
             'GraphManager', 'SettingService', 'ServerSelectorService', 'PageService',
             GraphController]);
 
-    function GraphController($scope, $window, $http, $timeout, gm, ss, sss, page) {
+    function GraphController($window, $http, $timeout, gm, ss, sss, page) {
 
-        $scope.panel_fixed = function () {
-            return gm.panel.fixed;
-        };
+        var gc = {
 
-        $scope.get_data = function (name) {
-            $scope.data = gm[name].graph;
-            return $scope.data;
-        };
+            node: function() {
+                return gm.selected.node;
+            },
 
-        $scope.display = function (name) {
-            return gm[name].display;
-        };
+            packet: function() {
+                return gm.selected.packet;
+            },
+            
+            panel_fixed: function () {
+                return gm.panel.fixed;
+            },
 
-        $scope.setNode = function (node) {
-            if (!gm.panel.fixed)
-                $scope.node = node;
-        };
+            get_data: function (name) {
+                return gm[name].graph;
+            },
 
-        $scope.displayDataPacket = function (data) {
-            if (!gm.panel.fixed)
-                $scope.packet = data;
-        };
+            display: function (name) {
+                return gm[name].display;
+            },
 
-        $scope.getHeight = function (name) {
-            switch (name) {
-                case 'timeline':
-                    return gm.timeline.height;
-                case 'network':
-                    return $window.innerHeight - gm.timeline.height - 16;
+            setNode: function (node) {
+                if (!gm.panel.fixed)
+                    gm.selected.node = node;
+            },
+
+            displayDataPacket: function (data) {
+                if (!gm.panel.fixed)
+                    gm.selected.packet = data;
+            },
+
+            getHeight: function (name) {
+                switch (name) {
+                    case 'timeline':
+                        return gm.timeline.height;
+                    case 'network':
+                        return $window.innerHeight - gm.timeline.height - 16;
+                }
+                return 0;
+            },
+
+            getWidth: function () {
+                return $window.innerWidth;
+            },
+
+            load: function (t) {
+                if (t > 1) return;
+                if (sss.serverkeySelected().length == 0) {
+                    $timeout(function () {
+                        gc.load(1);
+                    }, 1000);
+                    return;
+                }
+                var cacheID = sss.storage.getId();
+                if (cacheID) {
+                    $http.get('parse?cache=' + cacheID + '&serverkeys=' + sss.serverkeySelected().join(','))
+                        .success(function (data) {
+                            // Check error
+                            if (data.error) {
+                                console.log(data.error);
+                                return;
+                            }
+                            // Load data file
+                            gm.network.path = data.network;
+                            gm.timeline.path = data.timeline;
+                            gm.data.path = data.datapath;
+                            page.alert.info('Use cache information');
+                        });
+                }
+            },
+
+            showSetting: function () {
+                ss.display = !ss.display;
+            },
+
+            filter: function () {
+                return ss.protocols;
             }
-            return 0;
-        };
+        }
+        
 
-        $scope.getWidth = function () {
-            return $window.innerWidth;
-        };
-
-        $scope.load = function (t) {
-            if (t > 1) return;
-            if (sss.serverkeySelected().length == 0) {
-                $timeout(function () {
-                    $scope.load(1);
-                }, 1000);
-                return;
-            }
-            var cacheID = sss.storage.getId();
-            if (cacheID) {
-                $http.get('parse?cache=' + cacheID + '&serverkeys=' + sss.serverkeySelected().join(','))
-                    .success(function (data) {
-                        // Check error
-                        if (data.error) {
-                            console.log(data.error);
-                            return;
-                        }
-                        // Load data file
-                        gm.network.path = data.network;
-                        gm.timeline.path = data.timeline;
-                        gm.data.path = data.datapath;
-                        page.alert.info('Use cache information');
-                    });
-            }
-        };
-
-        $scope.showSetting = function () {
-            ss.display = !ss.display;
-        };
-
-        $scope.filter = function () {
-            return ss.protocols;
-        };
+        return gc;
     }
 })();

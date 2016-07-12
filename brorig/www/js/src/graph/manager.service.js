@@ -27,6 +27,10 @@
             },
             panel: {
                 fixed: false
+            },
+            selected: {
+                node: null,
+                packet: null,
             }
         }
     }
