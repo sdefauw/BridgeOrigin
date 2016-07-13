@@ -54,8 +54,7 @@
                 return $window.innerWidth;
             },
 
-            load: function (t) {
-                if (t > 1) return;
+            load: function () {
                 if (sss.serverkeySelected().length == 0) {
                     $timeout(function () {
                         gc.load(1);
@@ -78,6 +77,20 @@
                             page.alert.info('Use cache information');
                         });
                 }
+            },
+
+            new_packets: function (clean) {
+                // Display loading process
+                page.load.display();
+                // Clean old packets
+                if (clean) {
+                    gm.timeline.graph.packets = [];
+                    gm.data.path = null;
+                }
+                // Get new packets
+                sss.packetsRequest();
+                // Close the loading process
+                page.load.hidden();
             },
 
             showSetting: function () {

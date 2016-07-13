@@ -51,7 +51,8 @@
                         time: {
                             start: startTime,
                             stop: stopTime
-                        }
+                        },
+                        clean: true
                     }
                 }));
             },
