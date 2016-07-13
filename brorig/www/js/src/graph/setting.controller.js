@@ -7,9 +7,20 @@
 
         var setting = {
             adder: {},
+            menu: {
+                selected: "filter"
+            },
 
             show: function () {
                 return ss.display;
+            },
+
+            isActiveMenu: function (type) {
+                return setting.menu.selected === type ? 'selected' : '';
+            },
+
+            selectMenu: function (type) {
+                setting.menu.selected = type;
             },
 
             filtersAvailable: function () {
