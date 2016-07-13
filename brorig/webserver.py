@@ -8,6 +8,7 @@ import shutil
 import threading
 import time
 import uuid
+import datetime
 
 import tornado.escape
 import tornado.gen
@@ -180,6 +181,7 @@ class WebSocketNetworkHandler(tornado.websocket.WebSocketHandler):
                 "uuid": self.client.uuid
             }
         }))
+        self.timeline_th = None
         log.debug("WebSocket opened client %s" % self.client)
 
     def on_message(self, message):
@@ -204,16 +206,27 @@ class WebSocketNetworkHandler(tornado.websocket.WebSocketHandler):
         n = NetworkProcess([str(s) for s in server_keys], self)
         n.start()
 
-    def timeline_build(self, filter):
-        th = TimelineProcess(self, filter)
-        th.start()
+    def timeline_build(self, config):
+        if not self.timeline_th or not self.timeline_th.isAlive():
+           self.timeline_th = TimelineProcess(self, config)
+        # Set real time environment
+        if 'play' in config:
+            self.timeline_th.real_time = config['play']
+        # Start the process
+        if not self.timeline_th.isAlive():
+            self.timeline_th .start()
+        else:
+            log.info("Timeline thread is running, updating only some information")
 
 
 class TimelineProcess(threading.Thread):
-    def __init__(self, ws, filter):
+    def __init__(self, ws, config):
         threading.Thread.__init__(self)
         self.ws = ws
-        self.filter = filter
+        self.filter = config['filter']
+        self.clean_packet = config['clean']
+        self.real_time = False
+        self.refresh_interval = 10
 
     def __gen_packet_list(self, list):
         def time_format(t):
@@ -228,13 +241,37 @@ class TimelineProcess(threading.Thread):
                     "lane": item.uuid
                 } for item in list for p in item.packet_list() if p.src and p.src["time"]]
 
-    def run(self):
-        if self.filter['clean']:
+    def packet_trigger(self):
+        if self.clean_packet:
             self.ws.client.network.clean()
         timeline.Timeline(self.ws.client.network, self.ws.client.directory, self.filter).collect()
         self.ws.write_message(json.dumps({"packets": self.__gen_packet_list(self.ws.client.network.nodes)}))
         self.ws.write_message(json.dumps({"packets": self.__gen_packet_list(self.ws.client.network.links)}))
 
+    def run(self):
+        if self.real_time:
+            # refresh new packet
+            while self.real_time:
+                t = datetime.datetime.now()
+                self.packet_trigger()
+                delta = datetime.datetime.now() - t
+                d = self.refresh_interval - delta.seconds
+                if d < 0:
+                    log.warning("Real time issue: time to process data takes more time to refresh")
+                else:
+                    time.sleep(d)
+                # Adapt the filter for the next iteration
+                self.filter['time'] = {
+                    'start': d + 1,
+                    'stop': None
+                }
+        else:
+            # Inform only new packet
+            self.packet_trigger()
+            # Check if we don't need to run again
+            if self.real_time:
+                self.run()
+        
 
 class NetworkProcess(threading.Thread):
     def __init__(self, server_list, ws):

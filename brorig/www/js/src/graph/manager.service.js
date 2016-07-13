@@ -23,14 +23,15 @@
                 graph: {
                     lanes: [],
                     packets: []
-                }
+                },
+                realTime: false
             },
             panel: {
                 fixed: false
             },
             selected: {
                 node: null,
-                packet: null,
+                packet: null
             }
         }
     }

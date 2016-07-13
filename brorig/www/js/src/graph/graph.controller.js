@@ -79,7 +79,7 @@
                 }
             },
 
-            new_packets: function (clean) {
+            new_packets: function (clean, play) {
                 // Display loading process
                 page.load.display();
                 // Clean old packets
@@ -88,7 +88,7 @@
                     gm.data.path = null;
                 }
                 // Get new packets
-                sss.packetsRequest();
+                sss.packetsRequest(play);
                 // Close the loading process
                 page.load.hidden();
             },

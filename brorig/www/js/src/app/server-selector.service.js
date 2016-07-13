@@ -41,17 +41,21 @@
                 }));
             },
 
-            packetsRequest: function () {
+            packetsRequest: function (play) {
                 var startTime = ss.search.filter.historyTime;
                 var stopTime = null;
+                gm.timeline.realTime = play;
                 // Query packets with filers
                 ws.send(JSON.stringify({
                     timeline: {
-                        time: {
-                            start: startTime,
-                            stop: stopTime
+                        filter: {
+                            time: {
+                                start: startTime,
+                                stop: stopTime
+                            }
                         },
-                        clean: true
+                        clean: true,
+                        play: play
                     }
                 }));
             },
