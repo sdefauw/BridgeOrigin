@@ -1,9 +1,9 @@
 (function () {
 
     angular.module('graph')
-        .directive('timelineGraph', ['GraphManager', 'SettingService', 'ServerSelectorService', TimelineGraph]);
+        .directive('timelineGraph', ['GraphManager', 'SettingService', TimelineGraph]);
 
-    function TimelineGraph(gm, ss, sss) {
+    function TimelineGraph(gm, ss) {
 
         var lanes = [];
         var items = [];
@@ -200,7 +200,7 @@
 
             if (!domain)
             //TODO add a default domain (range scheduled)
-                domain = [new Date(new Date() - sss.filter.historyTime * 1000), new Date()];
+                domain = [new Date(new Date() - ss.search.filter.historyTime * 1000), new Date()];
 
             if(!x)
                 x = d3.time.scale()
