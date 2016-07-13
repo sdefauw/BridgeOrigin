@@ -93,6 +93,10 @@
                 page.load.hidden();
             },
 
+            isRealTime: function () {
+                return gm.timeline.realTime;
+            },
+
             showSetting: function () {
                 ss.display = !ss.display;
             },
@@ -100,7 +104,7 @@
             filter: function () {
                 return ss.protocols;
             }
-        }
+        };
         
 
         return gc;

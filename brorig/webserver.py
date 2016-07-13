@@ -253,6 +253,7 @@ class TimelineProcess(threading.Thread):
             # refresh new packet
             while self.real_time:
                 t = datetime.datetime.now()
+                # TODO correlate packet detected like start in the previous check and the end in this check
                 self.packet_trigger()
                 delta = datetime.datetime.now() - t
                 d = self.refresh_interval - delta.seconds
