@@ -220,13 +220,13 @@ class WebSocketNetworkHandler(tornado.websocket.WebSocketHandler):
 
 
 class TimelineProcess(threading.Thread):
-    def __init__(self, ws, config):
+    def __init__(self, ws, data):
         threading.Thread.__init__(self)
         self.ws = ws
-        self.filter = config['filter']
-        self.clean_packet = config['clean']
+        self.filter = data['filter']
+        self.clean_packet = data['clean']
         self.real_time = False
-        self.refresh_interval = 10
+        self.refresh_interval = config.config["real-time"]["refresh_interval"]
 
     def __gen_packet_list(self, list):
         def time_format(t):
