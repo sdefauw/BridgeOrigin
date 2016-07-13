@@ -1,5 +1,5 @@
 (function () {
     'use strict';
 
-    angular.module('graph', []);
+    angular.module('graph', ['cfp.hotkeys']);
 })();
