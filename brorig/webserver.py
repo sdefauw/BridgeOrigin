@@ -229,6 +229,8 @@ class TimelineProcess(threading.Thread):
                 } for item in list for p in item.packet_list() if p.src and p.src["time"]]
 
     def run(self):
+        if self.filter['clean']:
+            self.ws.client.network.clean()
         timeline.Timeline(self.ws.client.network, self.ws.client.directory, self.filter).collect()
         self.ws.write_message(json.dumps({"packets": self.__gen_packet_list(self.ws.client.network.nodes)}))
         self.ws.write_message(json.dumps({"packets": self.__gen_packet_list(self.ws.client.network.links)}))

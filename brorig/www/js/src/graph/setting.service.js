@@ -7,7 +7,12 @@
 
         var ss = {
             protocols: {},
-            display: false
+            display: false,
+            search: {
+                filter: {
+                    historyTime: 5*60
+                }
+            }
         };
 
         $http.get("protocol").success(function (data) {
