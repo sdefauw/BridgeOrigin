@@ -5,5 +5,5 @@ This server is a random network cluster given fake information. It is used to so
 
 Nothing must be changed in the default configuration file
 
-## Basic Server
-TODO
+## Custom server
+You can create your own type of server: see (development section)[dev.md]
