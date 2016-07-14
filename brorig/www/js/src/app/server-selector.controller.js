@@ -3,10 +3,10 @@
     angular.module('app')
         .controller('ServerSelectorController', [
             '$scope',
-            'ServerSelectorService',
+            'ServerSelectorService', 'PageService',
             ServerSelectorController]);
 
-    function ServerSelectorController($scope, sss) {
+    function ServerSelectorController($scope, sss, ps) {
 
         this.serversFiltered = null;
 
@@ -27,6 +27,7 @@
         };
         this.process = function () {
             this.close();
+            ps.windowsManager.closeAll();
             if (!sss.process())
                 this.open();
         };
