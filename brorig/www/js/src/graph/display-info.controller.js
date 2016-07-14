@@ -6,9 +6,7 @@
     function DisplayInfoController(gm) {
 
         this.close = function () {
-            gm.selected.node = null;
-            gm.selected.packet = null;
-            gm.panel.fixed = false;
+            gm.panel.close();
         };
 
         this.show = function () {
