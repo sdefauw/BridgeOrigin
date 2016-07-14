@@ -41,7 +41,7 @@
                 }));
             },
 
-            packetsRequest: function (play) {
+            packetsRequest: function (play, clean) {
                 var startTime = ss.search.filter.historyTime;
                 var stopTime = null;
                 gm.timeline.realTime = play;
@@ -54,7 +54,7 @@
                                 stop: stopTime
                             }
                         },
-                        clean: true,
+                        clean: !!clean,
                         play: play
                     }
                 }));

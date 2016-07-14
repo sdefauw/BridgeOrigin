@@ -226,11 +226,21 @@ class TimelineProcess(threading.Thread):
         self.filter = data['filter']
         self.clean_packet = data['clean']
         self.real_time = False
+        self.transfer_old = True
         self.refresh_interval = config.config["real-time"]["refresh_interval"]
 
     def __gen_packet_list(self, list):
         def time_format(t):
             return time.mktime(t.timetuple()) * 1e3 + t.microsecond / 1e3 if t else None
+
+        p_list_to_transfer = [(item, p) for item in list for p in item.packet_list() if p.src and p.src["time"] ]
+        # Remove packet already transferred
+        if not self.transfer_old:
+            p_list_to_transfer = [(item, p) for (item, p) in p_list_to_transfer if not hasattr(p, 'transferred')]
+
+        # Tag packet that transferred to the front-end
+        for (_, p) in p_list_to_transfer:
+            p.transferred = True
 
         return [{
                     "uuid": p.uuid,
@@ -239,12 +249,13 @@ class TimelineProcess(threading.Thread):
                     "start": time_format(p.src["time"]) if p.src else None,
                     "end": time_format(p.dst["time"]) if p.dst else None,
                     "lane": item.uuid
-                } for item in list for p in item.packet_list() if p.src and p.src["time"]]
+                } for (item, p) in p_list_to_transfer]
 
     def packet_trigger(self):
         if self.clean_packet:
             self.ws.client.network.clean()
         timeline.Timeline(self.ws.client.network, self.ws.client.directory, self.filter).collect()
+        self.transfer_old = not self.real_time
         self.ws.write_message(json.dumps({"packets": self.__gen_packet_list(self.ws.client.network.nodes)}))
         self.ws.write_message(json.dumps({"packets": self.__gen_packet_list(self.ws.client.network.links)}))
 

@@ -89,7 +89,7 @@
                     gm.data.path = null;
                 }
                 // Get new packets
-                sss.packetsRequest(play);
+                sss.packetsRequest(play, clean);
                 // Close the loading process
                 page.load.hidden();
             },
