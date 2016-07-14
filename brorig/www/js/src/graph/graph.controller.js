@@ -122,6 +122,17 @@
                 callback: function() {
                     gc.showSetting();
                 }
+            })
+            .add({
+                combo: 'space',
+                description: 'Play the realtime check',
+                callback: function() {
+                    if (gc.isRealTime()) {
+                        gc.new_packets(false, false);
+                    } else {
+                        gc.new_packets(false, true);
+                    }
+                }
             });
         
 
