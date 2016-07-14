@@ -2,11 +2,12 @@
 
     angular.module('graph')
         .controller('GraphController', [
-            '$window', "$http", "$timeout",
+            '$scope', '$window', "$http", "$timeout",
+            'hotkeys',
             'GraphManager', 'SettingService', 'ServerSelectorService', 'PageService',
             GraphController]);
 
-    function GraphController($window, $http, $timeout, gm, ss, sss, page) {
+    function GraphController($scope, $window, $http, $timeout, hotkeys, gm, ss, sss, page) {
 
         var gc = {
 
@@ -101,6 +102,23 @@
                 return ss.protocols;
             }
         }
+
+        // Define some shortcut
+        hotkeys.bindTo($scope)
+            .add({
+                combo: 'r',
+                description: 'Refresh the timeline',
+                callback: function() {
+                    gc.new_packets(true);
+                }
+            })
+            .add({
+                combo: 'f',
+                description: 'Open filter panel',
+                callback: function() {
+                    gc.showSetting();
+                }
+            });
         
 
         return gc;
