@@ -13,18 +13,21 @@
                         type: 'info',
                         txt: txt
                     };
+                    console.info(txt);
                 },
                 warning: function (txt) {
                     page.alert.data = {
                         type: 'warning',
                         txt: txt
                     };
+                    console.warn(txt);
                 },
                 error: function (txt) {
                     page.alert.data = {
                         type: 'error',
                         txt: txt
                     };
+                    console.error(txt);
                 }
             },
             load: {
