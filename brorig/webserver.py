@@ -25,6 +25,7 @@ import custom
 import log
 import network
 import timeline
+import sniffer
 
 threadServer = None
 
@@ -236,11 +237,11 @@ class TimelineProcess(threading.Thread):
         p_list_to_transfer = [(item, p) for item in list for p in item.packet_list() if p.src and p.src["time"] ]
         # Remove packet already transferred
         if not self.transfer_old:
-            p_list_to_transfer = [(item, p) for (item, p) in p_list_to_transfer if not hasattr(p, 'transferred')]
+            p_list_to_transfer = [(item, p) for (item, p) in p_list_to_transfer if not p.state == sniffer.Packet.ST_TRANSFERRED]
 
         # Tag packet that transferred to the front-end
         for (_, p) in p_list_to_transfer:
-            p.transferred = True
+            p.state = sniffer.Packet.ST_TRANSFERRED
 
         return [{
                     "uuid": p.uuid,
@@ -264,7 +265,6 @@ class TimelineProcess(threading.Thread):
             # refresh new packet
             while self.real_time:
                 t = datetime.datetime.now()
-                # TODO correlate packet detected like start in the previous check and the end in this check
                 self.packet_trigger()
                 delta = datetime.datetime.now() - t
                 d = self.refresh_interval - delta.seconds
