@@ -5,6 +5,7 @@ import gc
 import threading
 
 import log
+from sniffer import Packet
 
 
 class Timeline:
@@ -49,6 +50,7 @@ class Timeline:
                     # Node packet
                     if packet.internal or (packet.src and packet.dst and packet.src["server"] == packet.dst["server"]):
                         node.set_packets(packet)
+                        packet.state = Packet.ST_NEW
                         continue
                     # Link packet
                     if packet.src and packet.dst and packet.src['server'] == node.server and packet.dst[
@@ -60,10 +62,12 @@ class Timeline:
                             remote_packet = remote_packet[0]
                             # Update info
                             packet.dst = remote_packet.dst
+                            packet.state = Packet.ST_UPDATED
                         # Add to links
                         links_matched = [l for n, l in node.remote_vertex if n.server == packet.dst['server']]
                         for l in links_matched:
                             l.set_packets(packet)
+                            packet.state = Packet.ST_NEW
                 log.debug("Packet correlation done for sniffer %s on %s" % (sniffer.__class__.__name__, node.server.name))
 
     def __clean_sniffer(self):

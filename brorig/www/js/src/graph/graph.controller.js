@@ -80,7 +80,7 @@
                 }
             },
 
-            new_packets: function (clean) {
+            new_packets: function (clean, play) {
                 // Display loading process
                 page.load.display();
                 // Clean old packets
@@ -89,9 +89,13 @@
                     gm.data.path = null;
                 }
                 // Get new packets
-                sss.packetsRequest();
+                sss.packetsRequest(play, clean);
                 // Close the loading process
                 page.load.hidden();
+            },
+
+            isRealTime: function () {
+                return gm.timeline.realTime;
             },
 
             showSetting: function () {
@@ -101,7 +105,7 @@
             filter: function () {
                 return ss.protocols;
             }
-        }
+        };
 
         // Define some shortcut
         hotkeys.bindTo($scope)
@@ -117,6 +121,17 @@
                 description: 'Open filter panel',
                 callback: function() {
                     gc.showSetting();
+                }
+            })
+            .add({
+                combo: 'space',
+                description: 'Play the realtime check',
+                callback: function() {
+                    if (gc.isRealTime()) {
+                        gc.new_packets(false, false);
+                    } else {
+                        gc.new_packets(false, true);
+                    }
                 }
             });
         

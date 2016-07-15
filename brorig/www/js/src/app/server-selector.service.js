@@ -41,17 +41,21 @@
                 }));
             },
 
-            packetsRequest: function () {
+            packetsRequest: function (play, clean) {
                 var startTime = ss.search.filter.historyTime;
                 var stopTime = null;
+                gm.timeline.realTime = play;
                 // Query packets with filers
                 ws.send(JSON.stringify({
                     timeline: {
-                        time: {
-                            start: startTime,
-                            stop: stopTime
+                        filter: {
+                            time: {
+                                start: startTime,
+                                stop: stopTime
+                            }
                         },
-                        clean: true
+                        clean: !!clean,
+                        play: play
                     }
                 }));
             },
@@ -159,8 +163,19 @@
         };
 
         var packetsCallback = function (data) {
-            console.info('Add %d packets in the timeline graph', data.length);
-            gm.timeline.graph.packets = gm.timeline.graph.packets.concat(data);
+            // Only add new packets and update already in the timeline
+            var num_packet = gm.timeline.graph.packets.length;
+            var old_data = gm.timeline.graph.packets.filter(function (item) {
+                for (var i in data) {
+                    var packet = data[i];
+                    if (packet.uuid == item.uuid) return false;
+                }
+                return true;
+            });
+            gm.timeline.graph.packets = old_data.concat(data);
+            console.info('Add %d and update %d packets in the timeline graph (old:%d, recv:%d, tot:%d)',
+                data.length-(num_packet-old_data.length), num_packet-old_data.length,
+                old_data.length, data.length, gm.timeline.graph.packets.length);
         };
 
         var callbackHandler = {

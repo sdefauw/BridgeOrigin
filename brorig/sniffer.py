@@ -28,6 +28,8 @@ class Sniffer:
 
 
 class Packet:
+    ST_INIT, ST_NEW, ST_UPDATED, ST_TRANSFERRED = range(4)
+
     def __init__(self, protocol, category):
         self.category = category
         self.protocol = protocol
@@ -36,6 +38,7 @@ class Packet:
         self.internal = False
         self.uuid = base64.b32encode(uuid.uuid4().bytes)[:26]
         self.correlate_key = None
+        self.state = Packet.ST_INIT
 
     def set_src(self, server, time):
         self.src = {
