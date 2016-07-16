@@ -20,6 +20,13 @@ class Sniffer:
     def capture_stop(self):
         pass
 
+    def capture_status(self):
+        """
+        Check to capture status
+        :return: true if the capture is currently processed otherwise false
+        """
+        return True
+
     def clean(self):
         pass
 

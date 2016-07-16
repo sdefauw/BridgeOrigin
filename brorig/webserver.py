@@ -60,21 +60,39 @@ class ServerListHandler(tornado.web.RequestHandler):
                 json.dumps([{"name": s.name, "key": s.key, "group": s.group} for s in custom.server.farm.list()]))
 
 
-class ConfigurationHandler(tornado.web.RequestHandler):
-    def get(self):
-        command = self.get_argument("cmd")
-        server_list = self.get_argument("serverskey").split(",")
-        servers = [s for s in custom.server.farm.list() if str(s.key) in server_list]
+class ConfigurationSnifferHandler(tornado.web.RequestHandler):
+    def __get_server(self, server_list):
+        return [s for s in custom.server.farm.list() if str(s.key) in server_list]
+
+    def __apply_sniffer_action(self, server_list, action):
+        servers = self.__get_server(server_list)
         for server in servers:
             for sniffer in server.sniffers:
-                if command == "config":
-                    log.debug("Configure sniffer %s on %s" % (sniffer.__class__.__name__, server.name))
-                    sniffer.capture_start()
-                if command == "cleanup":
-                    log.debug("Cleanup traces on sniffer %s on %s" % (sniffer.__class__.__name__, server.name))
-                    sniffer.clean()
-        self.set_status(200)
-        self.write("Configured")
+                action(server, sniffer)
+
+    def get(self):
+        servers = self.__get_server(self.get_argument("serverskey").split(','))
+        status = [{'server': server.key, 'enable': sniffer.capture_status()}
+                  for server in servers for sniffer in server.sniffers]
+        self.write(json.dumps(status))
+
+    def delete(self):
+        def action(server, sniffer):
+            log.debug("Cleanup traces on sniffer %s on %s" % (sniffer.__class__.__name__, server.name))
+            sniffer.clean()
+        data = tornado.escape.json_decode(self.request.body)
+        self.__apply_sniffer_action(data['serverskey'], action)
+
+    def put(self, *args, **kwargs):
+        def action(server, sniffer):
+            log.debug("Configure sniffer %s on %s" % (sniffer.__class__.__name__, server.name))
+            if data['enable']:
+                sniffer.capture_start()
+            else:
+                sniffer.capture_stop()
+        data = tornado.escape.json_decode(self.request.body)
+        self.__apply_sniffer_action(data['serverskey'], action)
+
 
 
 class ProtocolHandler(tornado.web.RequestHandler):
@@ -295,7 +313,7 @@ class Application(tornado.web.Application):
             (r"/server/list", ServerListHandler),
             (r"/ws/network", WebSocketNetworkHandler),
             (r"/packet", PacketHandler),
-            (r"/configure", ConfigurationHandler),
+            (r"/configure/sniffer", ConfigurationSnifferHandler),
             (r'/protocol', ProtocolHandler),
             (r"/custom/(.*)", tornado.web.StaticFileHandler, {"path": os.path.join(custom.dir, "www")}),
             (r"/include/(.*)", tornado.web.StaticFileHandler, {"path": os.path.join(os.path.dirname(__file__), "www")}),

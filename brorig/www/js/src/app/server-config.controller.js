@@ -5,26 +5,44 @@
 
     function ServerConfigController(serverconfig) {
 
-        this.inProcess = '';
+        var scc = {
+            config: {
+                exe: function () {
+                    exe(scc.config, serverconfig.configure.exe);
+                },
+                status: function () {
+                    return serverconfig.configure.status;
+                },
+                inProgress: false
+            },
 
-        this.display = function () {
-            return serverconfig.display;
+            cleanup: {
+                exe: function () {
+                    exe(scc.cleanup, serverconfig.cleanup);
+                },
+                inProgress: false
+            },
+
+            display: function () {
+                return serverconfig.display;
+            },
+
+            close: function () {
+                serverconfig.display = false;
+            }
         };
 
-        this.close = function () {
-            serverconfig.display = false;
-        };
-
-        this.exe = function (cmd) {
-            if (this.inProcess != '') {
+        function exe(obj, exe) {
+            if (obj.inProgress) {
                 return;
             }
-            this.inProcess = cmd;
-            var self = this;
-            serverconfig.exe(cmd, function (d) {
-                self.inProcess = '';
-            })
+            obj.inProgress = true;
+            exe(function (d) {
+                obj.inProgress = false;
+            });
         }
+
+        return scc;
 
     }
 })();
