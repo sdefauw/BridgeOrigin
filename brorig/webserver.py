@@ -62,7 +62,8 @@ class ServerListHandler(tornado.web.RequestHandler):
 
 class ConfigurationSnifferHandler(tornado.web.RequestHandler):
     def __get_server(self, server_list):
-        return [s for s in custom.server.farm.list() if str(s.key) in server_list]
+        l = [str(i) for i in server_list]
+        return [s for s in custom.server.farm.list() if str(s.key) in l]
 
     def __apply_sniffer_action(self, server_list, action):
         servers = self.__get_server(server_list)
