@@ -8,6 +8,7 @@ import shutil
 import threading
 import time
 import uuid
+import datetime
 
 import tornado.escape
 import tornado.gen
@@ -24,6 +25,7 @@ import custom
 import log
 import network
 import timeline
+import sniffer
 
 threadServer = None
 
@@ -207,6 +209,7 @@ class WebSocketNetworkHandler(tornado.websocket.WebSocketHandler):
                 "uuid": self.client.uuid
             }
         }))
+        self.timeline_th = None
         log.debug("WebSocket opened client %s" % self.client)
 
     def on_message(self, message):
@@ -231,20 +234,41 @@ class WebSocketNetworkHandler(tornado.websocket.WebSocketHandler):
         n = NetworkProcess([str(s) for s in server_keys], self)
         n.start()
 
-    def timeline_build(self, filter):
-        th = TimelineProcess(self, filter)
-        th.start()
+    def timeline_build(self, config):
+        if not self.timeline_th or not self.timeline_th.isAlive():
+           self.timeline_th = TimelineProcess(self, config)
+        # Set real time environment
+        if 'play' in config:
+            self.timeline_th.real_time = config['play']
+        # Start the process
+        if not self.timeline_th.isAlive():
+            self.timeline_th .start()
+        else:
+            log.info("Timeline thread is running, updating only some information")
 
 
 class TimelineProcess(threading.Thread):
-    def __init__(self, ws, filter):
+    def __init__(self, ws, data):
         threading.Thread.__init__(self)
         self.ws = ws
-        self.filter = filter
+        self.filter = data['filter']
+        self.clean_packet = data['clean']
+        self.real_time = False
+        self.transfer_old = True
+        self.refresh_interval = config.config["real-time"]["refresh_interval"]
 
     def __gen_packet_list(self, list):
         def time_format(t):
             return time.mktime(t.timetuple()) * 1e3 + t.microsecond / 1e3 if t else None
+
+        p_list_to_transfer = [(item, p) for item in list for p in item.packet_list() if p.src and p.src["time"] ]
+        # Remove packet already transferred
+        if not self.transfer_old:
+            p_list_to_transfer = [(item, p) for (item, p) in p_list_to_transfer if not p.state == sniffer.Packet.ST_TRANSFERRED]
+
+        # Tag packet that transferred to the front-end
+        for (_, p) in p_list_to_transfer:
+            p.state = sniffer.Packet.ST_TRANSFERRED
 
         return [{
                     "uuid": p.uuid,
@@ -253,13 +277,40 @@ class TimelineProcess(threading.Thread):
                     "start": time_format(p.src["time"]) if p.src else None,
                     "end": time_format(p.dst["time"]) if p.dst else None,
                     "lane": item.uuid
-                } for item in list for p in item.packet_list() if p.src and p.src["time"]]
+                } for (item, p) in p_list_to_transfer]
 
-    def run(self):
+    def packet_trigger(self):
+        if self.clean_packet:
+            self.ws.client.network.clean()
         timeline.Timeline(self.ws.client.network, self.ws.client.directory, self.filter).collect()
+        self.transfer_old = not self.real_time
         self.ws.write_message(json.dumps({"packets": self.__gen_packet_list(self.ws.client.network.nodes)}))
         self.ws.write_message(json.dumps({"packets": self.__gen_packet_list(self.ws.client.network.links)}))
 
+    def run(self):
+        if self.real_time:
+            # refresh new packet
+            while self.real_time:
+                t = datetime.datetime.now()
+                self.packet_trigger()
+                delta = datetime.datetime.now() - t
+                d = self.refresh_interval - delta.seconds
+                if d < 0:
+                    log.warning("Real time issue: time to process data takes more time to refresh")
+                else:
+                    time.sleep(d)
+                # Adapt the filter for the next iteration
+                self.filter['time'] = {
+                    'start': d + 1,
+                    'stop': None
+                }
+        else:
+            # Inform only new packet
+            self.packet_trigger()
+            # Check if we don't need to run again
+            if self.real_time:
+                self.run()
+        
 
 class NetworkProcess(threading.Thread):
     def __init__(self, server_list, ws):

@@ -5,5 +5,8 @@
   "server": {
     "log": "brorig.log",
     "data_path": "data/"
+  },
+  "real-time": {
+    "refresh_interval": 10
   }
 }

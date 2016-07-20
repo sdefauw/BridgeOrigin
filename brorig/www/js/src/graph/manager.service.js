@@ -4,7 +4,7 @@
         .factory('GraphManager', GraphManager);
 
     function GraphManager() {
-        return {
+        var gm =  {
             uuid: null,
             data: {
                 path: null
@@ -23,11 +23,23 @@
                 graph: {
                     lanes: [],
                     packets: []
-                }
+                },
+                realTime: false
             },
             panel: {
-                fixed: false
+                fixed: false,
+                close: function () {
+                    gm.selected.node = null;
+                    gm.selected.packet = null;
+                    gm.panel.fixed = false;
+                }
+            },
+            selected: {
+                node: null,
+                packet: null
             }
-        }
+        };
+
+        return gm;
     }
 })();

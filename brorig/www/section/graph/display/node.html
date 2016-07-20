@@ -1,23 +1,23 @@
-<div ng-show="node">
+<div ng-show="gc.node()">
     <h1>Server</h1>
     <table>
         <tr>
             <td>Name</td>
-            <td class='data' ng-show="!node.link">{{!node.name}}</td>
-            <td class='data' ng-show="node.link"><a href="{{!node.link}}" target="_target">{{!node.name}}</a></td>
+            <td class='data' ng-show="!gc.node().link">{{!gc.node().name}}</td>
+            <td class='data' ng-show="gc.node().link"><a href="{{!gc.node().link}}" target="_target">{{!gc.node().name}}</a></td>
         </tr>
         <tr>
             <td>Key</td>
-            <td class='data'>{{!node.serverkey}}</td>
+            <td class='data'>{{!gc.node().serverkey}}</td>
         </tr>
         <tr>
             <td>Cluster</td>
-            <td class='data'>{{!node.cluster}}</td>
+            <td class='data'>{{!gc.node().cluster}}</td>
         </tr>
         <tr>
             <td colspan='2'>Own connectivity
                 <table style='padding-left: 10px'>
-                    <tr ng-repeat="c in node.connectivity.own ">
+                    <tr ng-repeat="c in gc.node().connectivity.own ">
                         <td>{{!c.name}}</td>
                         <td class='data'>{{!c.conn}}</td>
                     </tr>
@@ -27,7 +27,7 @@
         <tr>
             <td colspan='2'>Remote connection
                 <table style='padding-left: 10px'>
-                    <tr ng-repeat="c in node.connectivity.remote ">
+                    <tr ng-repeat="c in gc.node().connectivity.remote ">
                         <td>{{!c.name}}</td>
                         <td class='data'>{{!c.conn}}</td>
                     </tr>

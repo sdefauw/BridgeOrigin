@@ -19,6 +19,9 @@ class Vertex:
     def packet_list(self):
         return self.__packets
 
+    def clean_packets(self):
+        self.__packets = []
+
 
 class Edge:
     def __init__(self, name, src=None, dst=None):
@@ -33,6 +36,9 @@ class Edge:
 
     def packet_list(self):
         return self.__packets
+
+    def clean_packets(self):
+        self.__packets = []
 
 
 class Network:
@@ -63,3 +69,8 @@ class Network:
             if connectivity_id in node.conn:
                 return node
         return None
+
+    def clean(self):
+        # Remove packets on edges and vertexes
+        for i in self.nodes + self.links:
+            i.clean_packets()

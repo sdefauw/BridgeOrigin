@@ -1,19 +1,28 @@
-<div ng-controller="GraphController as gc" ng-init="load()">
+<div ng-controller="GraphController as gc" ng-init="gc.load()">
 
-    <div network-graph data="get_data('network')" width="getWidth()" height="getHeight('network')"
-         selected-node="setNode(node)"></div>
+    <div network-graph data="gc.get_data('network')" width="gc.getWidth()" height="gc.getHeight('network')"
+         selected-node="gc.setNode(node)"></div>
 
-    <img src="{{ static_url('img/setting.svg') }}"
-         style="display: block; position: absolute; right: 0; height: 15px; cursor: pointer;"
-         ng-show="display('timeline')" ng-click="showSetting()"/>
+    <nav ng-show="gc.display('timeline')" class="timeline-nav">
+        <a href="#" ng-dblclick="gc.new_packets(false, true)" ng-click="gc.new_packets(true, false)" ng-show="!gc.isRealTime()">
+            <img src="{{ static_url('img/refresh.svg') }}" style="height: 12px; padding: 4px 1px;" />
+        </a>
+        <a href="#" ng-click="gc.new_packets(false, false)" ng-show="gc.isRealTime()">
+            <img src="{{ static_url('img/refresh_over.svg') }}" style="height: 12px; padding: 4px 1px;" />
+        </a>
+        <a href="#" ng-click="gc.showSetting()">
+                <img src="{{ static_url('img/filter.svg') }}" style="height: 16px; padding: 2px;" />
+        </a>
+    </nav>
 
-    <div timeline-graph display="display('timeline')" width="getWidth()" height="getHeight('timeline')" height-lane="20"
-         selected-time="" selected-data="displayDataPacket(data)" filter="filter()"
-         data="get_data('timeline').packets"></div>
+
+    <div timeline-graph display="gc.display('timeline')" width="gc.getWidth()" height="gc.getHeight('timeline')" height-lane="20"
+         selected-time="" selected-data="gc.displayDataPacket(data)" filter="gc.filter()"
+         data="gc.get_data('timeline').packets"></div>
 
 
     <section id="displayinfo" ng-controller="DisplayInfoController as dic" ng-show="dic.show()">
-        <img src="{{ static_url('img/x.svg') }}" ng-click="dic.close()" ng-show="panel_fixed()" class="close"/>
+        <img src="{{ static_url('img/x.svg') }}" ng-click="dic.close()" ng-show="gc.panel_fixed()" class="close"/>
 
         {% include "graph/display/node.html" %}
         {% include "graph/display/packet.html" %}
@@ -21,7 +30,7 @@
     </section>
 
     <div class="selectbox" id="gsetting" ng-controller="SettingController as sc" ng-show="sc.show()">
-        <img src="{{ static_url('img/x.svg') }}" ng-click="showSetting()" class="close"/>
+        <img src="{{ static_url('img/x.svg') }}" ng-click="gc.showSetting()" class="close"/>
 
         {% include "graph/timeline/options.html" %}
     </div>

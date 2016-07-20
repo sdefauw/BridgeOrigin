@@ -1,18 +1,16 @@
 (function () {
 
     angular.module('graph')
-        .controller('DisplayInfoController', ['$scope', 'GraphManager', DisplayInfoController]);
+        .controller('DisplayInfoController', ['GraphManager', DisplayInfoController]);
 
-    function DisplayInfoController($scope, gm) {
+    function DisplayInfoController(gm) {
 
         this.close = function () {
-            $scope.$parent.node = null;
-            $scope.$parent.packet = null;
-            gm.panel.fixed = false;
+            gm.panel.close();
         };
 
         this.show = function () {
-            return gm.panel.fixed || $scope.$parent.node != null || $scope.$parent.packet != null;
+            return gm.panel.fixed || gm.selected.node != null || gm.selected.packet != null;
         };
 
     }

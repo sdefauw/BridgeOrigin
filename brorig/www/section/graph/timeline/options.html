@@ -1,8 +1,11 @@
-<div class="section">
-    <h1>Settings</h1>
+<div class="section filter">
+    <nav>
+        <a ng-class="{ selected: sc.isActiveMenu('search')}" ng-click="sc.selectMenu('search')">Search</a>
+        <a ng-class="{ selected: sc.isActiveMenu('filter')}" ng-click="sc.selectMenu('filter')">Filter</a>
+    </nav>
 
-    <div class="subsection" ng-repeat="(protocol, filter) in sc.filtersAvailable()">
-        <h2 class="title">{{!filter.name }} ({{!filter.desc}})</h2>
+    <div class="subsection" ng-repeat="(protocol, filter) in sc.filtersAvailable()" ng-show="sc.isActiveMenu('filter')">
+        <h1 class="title">{{!filter.name }} ({{!filter.desc}})</h1>
         <ul class="filterbox">
             <li ng-repeat="regex in filter.selected" title="{{!filter.category[regex].desc}}">
                 <img src="{{ static_url('img/x.svg') }}" ng-click="sc.rmProtocol(protocol, regex)"/>
@@ -18,5 +21,14 @@
                 </option>
             </datalist>
         </form>
+    </div>
+
+    <div ng-show="sc.isActiveMenu('search')">
+        <h1>Time processing interval</h1>
+        <section>
+            <label for="tfilter">Duration until now</label>
+            <select name="tfilter" id="tfilter" ng-model="sc.tfilter" ng-change="sc.tfilterSelect()" ng-options="opt as opt.label for opt in sc.timeFilterOptions">
+            </select>
+        </section>
     </div>
 </div>

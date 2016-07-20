@@ -3,22 +3,10 @@
     angular.module('app')
         .controller('ServerSelectorController', [
             '$scope',
-            'ServerSelectorService',
+            'ServerSelectorService', 'PageService',
             ServerSelectorController]);
 
-    function ServerSelectorController($scope, sss) {
-
-        this.tFilterOptions = [
-            {label: '1 min', value: 60},
-            {label: '5 min', value: 5 * 60},
-            {label: '15 min', value: 15 * 60},
-            {label: '30 min', value: 30 * 60},
-            {label: '1 h', value: 60 * 60},
-            {label: '5 h', value: 5 * 60},
-            {label: '10 h', value: 10 * 60},
-            {label: 'All log', value: ''}
-        ];
-        $scope.tfilter = this.tFilterOptions[1];
+    function ServerSelectorController($scope, sss, ps) {
 
         this.serversFiltered = null;
 
@@ -39,7 +27,7 @@
         };
         this.process = function () {
             this.close();
-            sss.filter.historyTime = $scope.tfilter.value;
+            ps.windowsManager.closeAll();
             if (!sss.process())
                 this.open();
         };

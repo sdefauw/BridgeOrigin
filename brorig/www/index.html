@@ -5,6 +5,7 @@
 <script src="{{ static_url('js/src/app/alert.controller.js') }}"></script>
 <script src="{{ static_url('js/src/app/loading.controller.js') }}"></script>
 <script src="{{ static_url('js/src/app/main-tool-bar.controller.js') }}"></script>
+<script src="{{ static_url('js/src/app/page.controller.js') }}"></script>
 <script src="{{ static_url('js/src/app/page.service.js') }}"></script>
 <script src="{{ static_url('js/src/app/server-config.controller.js') }}"></script>
 <script src="{{ static_url('js/src/app/server-config.service.js') }}"></script>
@@ -37,15 +38,17 @@
 
 
 {% block body %}
-<div id="loading" ng-controller="LoadingController as loading" ng-show="loading.show()"></div>
-<div id="alert" ng-controller="AlertController as alert" ng-show="alert.show()" ng-class="[alert.class()]">
-    <span>{{!alert.txt()}}</span>
-    <button ng-click="alert.close()">OK</button>
-</div>
+<div ng-controller="PageController as pc">
+	<div id="loading" ng-controller="LoadingController as loading" ng-show="loading.show()"></div>
+	<div id="alert" ng-controller="AlertController as alert" ng-show="alert.show()" ng-class="[alert.class()]">
+	    <span>{{!alert.txt()}}</span>
+	    <button ng-click="alert.close()">OK</button>
+	</div>
 
-{% include "section/mainbar.html" %}
-{% include "section/sniffer_config.html" %}
-{% include "section/server_selector.html" %}
-{% include "section/graph.html" %}
+	{% include "section/mainbar.html" %}
+	{% include "section/sniffer_config.html" %}
+	{% include "section/server_selector.html" %}
+	{% include "section/graph.html" %}
+</div>
 
 {% end %}
