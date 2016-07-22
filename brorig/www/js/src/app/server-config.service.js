@@ -1,18 +1,18 @@
 (function () {
 
     angular.module('app')
-        .service('ServerConfigService', ['$http', 'PageService', 'ServerSelectorService', ServerConfigService]);
+        .service('ServerConfigService', ['$http', 'AlertService', 'ServerSelectorService', ServerConfigService]);
 
-    function ServerConfigService($http, page, sss) {
+    function ServerConfigService($http, al, sss) {
 
         var cl = {
             display: false,
 
             configure: {
                 exe: function (callback) {
-                    var serverkeys = sss.serverkeySelected();
+                    var serverkeys = sss.serverKeySelected();
                     if (!serverkeys.length) {
-                        page.alert.warning("You need to select servers !");
+                        al.warning("You need to select servers !");
                         return;
                     }
                     var req = {
@@ -30,13 +30,13 @@
                             callback(data);
                         })
                         .error(function (data, status) {
-                            page.alert.error("Impossible to configure sniffers");
+                            al.error("Impossible to configure sniffers");
                         });
                 },
                 
                 status: '...',
                 update_status: function () {
-                    var serverkeys = sss.serverkeySelected();
+                    var serverkeys = sss.serverKeySelected();
                     if (!serverkeys.length) {
                         return;
                     }
@@ -59,15 +59,15 @@
                             }
                         })
                         .error(function (data, status) {
-                            page.alert.error("Impossible to get sniffer configuration status");
+                            al.error("Impossible to get sniffer configuration status");
                         });
                 }
             },
 
             cleanup: function (callback) {
-                var serverkeys = sss.serverkeySelected();
+                var serverkeys = sss.serverKeySelected();
                 if (!serverkeys.length) {
-                    page.alert.warning("You need to select servers !");
+                    al.warning("You need to select servers !");
                     return;
                 }
                 var req = {
@@ -80,7 +80,7 @@
                         callback(data);
                     })
                     .error(function (data, status) {
-                        page.alert.error("Fail to clean sniffers");
+                        al.error("Fail to clean sniffers");
                     });
             }
         };

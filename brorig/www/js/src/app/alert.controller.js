@@ -1,23 +1,23 @@
 (function () {
 
     angular.module('app')
-        .controller('AlertController', ['PageService', AlertController]);
+        .controller('AlertController', ['AlertService', AlertController]);
 
-    function AlertController(page) {
+    function AlertController(al) {
         this.show = function () {
-            return page.alert.data != null;
+            return al.data != null;
         };
 
         this.txt = function () {
-            return this.show() ? page.alert.data.txt : '';
+            return this.show() ? al.data.txt : '';
         };
 
         this.class = function () {
-            return this.show() ? page.alert.data.type : '';
+            return this.show() ? al.data.type : '';
         };
 
         this.close = function () {
-            page.alert.data = null;
+            al.data = null;
         }
     }
 })();

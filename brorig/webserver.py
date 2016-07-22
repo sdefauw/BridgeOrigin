@@ -166,6 +166,7 @@ class User:
         self.directory = self.__allocate_directory()
         self.network = None
         self.timeline = None
+        self.timeline_filter = {}
 
     def __allocate_directory(self):
         root_path = config.config['server']['data_path']
@@ -235,24 +236,37 @@ class WebSocketNetworkHandler(tornado.websocket.WebSocketHandler):
         n.start()
 
     def timeline_build(self, config):
-        if not self.timeline_th or not self.timeline_th.isAlive():
-           self.timeline_th = TimelineProcess(self, config)
-        # Set real time environment
-        if 'play' in config:
-            self.timeline_th.real_time = config['play']
-        # Start the process
-        if not self.timeline_th.isAlive():
-            self.timeline_th .start()
-        else:
-            log.info("Timeline thread is running, updating only some information")
+        # Set configuration in the timeline
+        if 'filter' in config:
+            # TODO
+            # use self.client.timeline_filter
+            pass
+        if 'packet' in config:
+            self.client.timeline_filter['time'] = {
+                'start': datetime.datetime.fromtimestamp(config['packet']['from']/1000),
+                'stop': datetime.datetime.fromtimestamp(config['packet']['to']/1000)
+            }
+        # Execute request
+        if 'play' in config or 'packet' in config:
+            # Configure the helper thread
+            if not self.timeline_th or not self.timeline_th.isAlive():
+                self.timeline_th = TimelinePacketProcessHelper(self, config['clean'], self.client.timeline_filter)
+            # Set real time environment
+            if 'play' in config:
+                self.timeline_th.real_time = config['play']
+            # Start the process
+            if not self.timeline_th.isAlive():
+                self.timeline_th.start()
+            else:
+                log.info("Timeline thread is running, updating only some information")
 
 
-class TimelineProcess(threading.Thread):
-    def __init__(self, ws, data):
+class TimelinePacketProcessHelper(threading.Thread):
+    def __init__(self, ws, clean=False, filter={}):
         threading.Thread.__init__(self)
         self.ws = ws
-        self.filter = data['filter']
-        self.clean_packet = data['clean']
+        self.filter = filter
+        self.clean_packet = clean
         self.real_time = False
         self.transfer_old = True
         self.refresh_interval = config.config["real-time"]["refresh_interval"]
@@ -290,20 +304,30 @@ class TimelineProcess(threading.Thread):
     def run(self):
         if self.real_time:
             # refresh new packet
+            log.info("Start real-time")
+            time.sleep(self.refresh_interval)
+            t = datetime.datetime.now()
+            self.filter['time'] = {
+                'start': t - datetime.timedelta(seconds=self.refresh_interval),
+                'stop': t
+            }
             while self.real_time:
                 t = datetime.datetime.now()
+                # Collect packets
                 self.packet_trigger()
-                delta = datetime.datetime.now() - t
-                d = self.refresh_interval - delta.seconds
+                # Compute next time
+                now = datetime.datetime.now()
+                d = self.refresh_interval - (now - t).seconds
                 if d < 0:
                     log.warning("Real time issue: time to process data takes more time to refresh")
                 else:
                     time.sleep(d)
                 # Adapt the filter for the next iteration
                 self.filter['time'] = {
-                    'start': d + 1,
-                    'stop': None
+                    'start': t,
+                    'stop': datetime.datetime.now()
                 }
+            log.info("End of real-time")
         else:
             # Inform only new packet
             self.packet_trigger()
