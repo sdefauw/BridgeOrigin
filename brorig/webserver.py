@@ -100,13 +100,18 @@ class ConfigurationSnifferHandler(tornado.web.RequestHandler):
 
 class ProtocolHandler(tornado.web.RequestHandler):
     def load_json(self, path):
-        json_data = open(path)
-        protocol = json.load(json_data)
-        json_data.close()
-        return protocol
+        try:
+            json_data = open(path, 'r')
+            protocol = json.load(json_data)
+            json_data.close()
+            return protocol
+        except IOError as e:
+            return {}
 
     def get(self):
-        protocol = self.load_json(custom.dir + "protocol.json")
+        protocol = self.load_json('www/packet/protocol.json')
+        protocol_custom = self.load_json(custom.dir + "protocol.json")
+        protocol.update(protocol_custom)
         # TODO add default protocol supported
         self.write(json.dumps(protocol))
 
