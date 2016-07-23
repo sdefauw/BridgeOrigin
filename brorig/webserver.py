@@ -243,8 +243,8 @@ class WebSocketNetworkHandler(tornado.websocket.WebSocketHandler):
             pass
         if 'packet' in config:
             self.client.timeline_filter['time'] = {
-                'start': datetime.datetime.fromtimestamp(config['packet']['from']/1000),
-                'stop': datetime.datetime.fromtimestamp(config['packet']['to']/1000)
+                'start': datetime.datetime.utcfromtimestamp(config['packet']['from']/1000),
+                'stop': datetime.datetime.utcfromtimestamp(config['packet']['to']/1000)
             }
         # Execute request
         if 'play' in config or 'packet' in config:

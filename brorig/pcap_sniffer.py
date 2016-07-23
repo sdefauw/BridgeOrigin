@@ -1,9 +1,12 @@
 import pyshark
 import os
 import re
+import datetime
 
+import custom
 import sniffer
 import connectivity
+import log
 
 
 class PcapFileSniffer(sniffer.Sniffer):
@@ -15,21 +18,26 @@ class PcapFileSniffer(sniffer.Sniffer):
 
     def __process_cap(self, cap):
         for packet in cap:
+            if self.protocol not in packet:
+                continue
             p = CapPacket(packet[self.protocol], self.protocol, self.prot_cat(eval("packet.%s" % self.protocol)))
             src = packet[self.connectivity_layer].src
             dst = packet[self.connectivity_layer].dst
-            time = packet.sniff_timestamp
+            time = datetime.datetime.utcfromtimestamp(float(packet.sniff_timestamp))
             if src in self.server.connectivity():
                 # Send packet
-                p.set_src(src, time)
-                p.set_dst(dst)
+                p.set_src(self.server, time)
+                dst_server = custom.server.farm.get_server_by_connectivity(dst)
+                p.set_dst(dst_server)
             else:
                 # Recv packet
-                p.set_dst(src)
-                p.set_src(dst, time)
+                src_server = custom.server.farm.get_server_by_connectivity(src)
+                p.set_dst(src_server, time)
+                p.set_src(self.server)
+            self.packets.append(p)
 
-    def get_packets(self, filter, tmp_dir):
-        cap = pyshark.FileCapture(os.path.join(tmp_dir, '%d.pcap' % self.server.key))
+    def get_packets(self, filter, file_path):
+        cap = pyshark.FileCapture(file_path)
         self.__process_cap(cap)
 
 
@@ -60,8 +68,28 @@ class PcapRemoteSniffer(PcapFileSniffer):
 
     def get_packets(self, filter, tmp_dir):
         # TODO transfert the pcap trace to the main server
-        # PcapFileSniffer.get_packets(self, filter, tmp_dir)
-        return []
+        transfer_path = "/tmp/brorig_transfer.pcap"
+        local_path = os.path.join(tmp_dir, "log/pcap/")
+        # Shrink the pcap trace base on the filter
+        log.debug("Shrink the pcap file based on filters")
+        t_start = filter['time']['start'].strftime("%Y-%m-%d %X")
+        t_stop = filter['time']['stop'].strftime("%Y-%m-%d %X")
+        shrink_cmd = 'sudo editcap -v -A "%s" -B "%s" %s %s > /dev/null 2> /dev/null' % (
+            t_start, t_stop, self.remote_file_path, transfer_path)
+        connectivity.Script.remote_exe(self.server.ssh_connection, shrink_cmd)
+        # Download the trace to the server directory
+        log.debug("Download pcap trace shrinked")
+        if not os.path.exists(local_path):
+            os.makedirs(local_path)
+        local_path = os.path.join(local_path,
+                                  '%s-%s.pcap' % (filter['time']['stop'].strftime("%Y-%m-%dT%X"), self.server.key))
+        self.server.ssh_connection.open_ssh_connexion()
+        trans = connectivity.Transfer(self.server.ssh_connection.transport)
+        trans.get(transfer_path, local_path)
+        self.server.ssh_connection.close_ssh_connexion()
+        # Read the trace
+        log.debug("Read pcap trace")
+        PcapFileSniffer.get_packets(self, filter, local_path)
 
 
 class CapPacket(sniffer.Packet):
@@ -73,7 +101,7 @@ class CapPacket(sniffer.Packet):
         if not isinstance(other, CapPacket):
             return False
         # TODO too CPU computation
-        return self.packet == other.packet
+        return str(self.packet) == str(other.packet)
 
     def template(self):
         return ("packet.html", {
