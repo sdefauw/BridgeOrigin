@@ -40,6 +40,9 @@ class PcapFileSniffer(sniffer.Sniffer):
         cap = pyshark.FileCapture(file_path)
         self.__process_cap(cap)
 
+    def protocol_used(self):
+        return [self.protocol]
+
 
 class PcapRemoteSniffer(PcapFileSniffer):
     def __init__(self, server, protocol, category_fun, conn_layer='ip', ports=None, filter=None):

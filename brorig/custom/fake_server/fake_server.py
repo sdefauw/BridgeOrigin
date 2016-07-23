@@ -69,6 +69,9 @@ class FakeSniffer(sniffer.Sniffer):
             p.set_dst(self.server, d.replace(microsecond=(m if m < 1000000 else 999999)))
             self.packets.append(p)
 
+    def protocol_used(self):
+        return ['fakepacket']
+
 
 class FakePacket(sniffer.Packet):
     def __init__(self, name):

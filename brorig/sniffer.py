@@ -33,6 +33,13 @@ class Sniffer:
     def get_packets(self, filter, tmp_dir):
         pass
 
+    def protocol_used(self):
+        """
+        List of all protocol used by this sniffer
+        :return: List of protocol key defined in protocol.json
+        """
+        return []
+
 
 class Packet:
     ST_INIT, ST_NEW, ST_UPDATED, ST_TRANSFERRED = range(4)
