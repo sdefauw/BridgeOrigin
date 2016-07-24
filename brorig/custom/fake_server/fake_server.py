@@ -61,7 +61,7 @@ class FakeSniffer(sniffer.Sniffer):
     def get_packets(self, filter, tmp_dir):
         for i in range(0, 20):
             p = FakePacket("cat." + str(random.randint(0, 3)))
-            now = datetime.datetime.now()
+            now = datetime.datetime.utcnow()
             trand = random.randint(0, (filter['time']['stop'] - filter['time']['start']).seconds*1000*1000)
             d = now - datetime.timedelta(microseconds=trand)
             p.set_src(self.server, d)

@@ -7,6 +7,7 @@ import os
 import shutil
 import threading
 import time
+import calendar
 import uuid
 import datetime
 
@@ -285,7 +286,7 @@ class TimelinePacketProcessHelper(threading.Thread):
 
     def __gen_packet_list(self, list):
         def time_format(t):
-            return time.mktime(t.timetuple()) * 1e3 + t.microsecond / 1e3 if t else None
+            return calendar.timegm(t.timetuple()) * 1e3 + t.microsecond / 1e3 if t else None
 
         p_list_to_transfer = [(item, p) for item in list for p in item.packet_list() if p.src and p.src["time"] ]
         # Remove packet already transferred
@@ -318,17 +319,17 @@ class TimelinePacketProcessHelper(threading.Thread):
             # refresh new packet
             log.info("Start real-time")
             time.sleep(self.refresh_interval)
-            t = datetime.datetime.now()
+            t = datetime.datetime.utcnow()
             self.filter['time'] = {
                 'start': t - datetime.timedelta(seconds=self.refresh_interval),
                 'stop': t
             }
             while self.real_time:
-                t = datetime.datetime.now()
+                t = datetime.datetime.utcnow()
                 # Collect packets
                 self.packet_trigger()
                 # Compute next time
-                now = datetime.datetime.now()
+                now = datetime.datetime.utcnow()
                 d = self.refresh_interval - (now - t).seconds
                 if d < 0:
                     log.warning("Real time issue: time to process data takes more time to refresh")
@@ -337,7 +338,7 @@ class TimelinePacketProcessHelper(threading.Thread):
                 # Adapt the filter for the next iteration
                 self.filter['time'] = {
                     'start': t,
-                    'stop': datetime.datetime.now()
+                    'stop': datetime.datetime.utcnow()
                 }
             log.info("End of real-time")
         else:
