@@ -36,8 +36,8 @@ class PcapFileSniffer(sniffer.Sniffer):
             else:
                 # Recv packet
                 src_server = custom.server.farm.get_server_by_connectivity(src)
-                p.set_dst(src_server, time)
-                p.set_src(self.server)
+                p.set_src(src_server)
+                p.set_dst(self.server, time)
             self.packets.append(p)
 
     def get_packets(self, filter, file_path):
@@ -123,7 +123,14 @@ class HttpPacket(CapPacket):
         if not isinstance(other, HttpPacket):
             return False
         if hasattr(self.packet, 'request_method') and hasattr(other.packet, 'request_method'):
-            # TODO not reliable
+            delta = None
+            if self.dst['time'] and other.src['time']:
+                delta = abs(other.src['time'] - self.dst['time'])
+            if self.src['time'] and other.dst['time']:
+                delta = abs(self.src['time'] - other.dst['time'])
+            threshold = datetime.timedelta(microseconds=100000)
+            if not delta or delta > threshold:
+                return False
             return self.packet.request_method == other.packet.request_method and self.packet.request_uri == other.packet.request_uri and self.packet.request_method == other.packet.request_method and self.packet.host == other.packet.host
         if hasattr(self.packet, 'response_code') and hasattr(other.packet, 'response_code'):
             return self.packet.response_code == other.packet.response_code and self.packet.date == other.packet.date

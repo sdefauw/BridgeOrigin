@@ -63,6 +63,9 @@ class Timeline:
                             # Update info
                             packet.dst = remote_packet.dst
                             packet.state = Packet.ST_UPDATED
+                        elif len(remote_packet) > 2:
+                            log.warning("Multiple remote packet is found !")
+                            # TODO take the short time delta
                         # Add to links
                         links_matched = [l for n, l in node.remote_vertex if n.server == packet.dst['server']]
                         for l in links_matched:
