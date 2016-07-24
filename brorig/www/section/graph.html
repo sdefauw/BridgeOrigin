@@ -1,13 +1,13 @@
-<div ng-controller="GraphController as gc" ng-init="gc.load()">
+<div ng-controller="GraphController as gc">
 
     <div network-graph data="gc.get_data('network')" width="gc.getWidth()" height="gc.getHeight('network')"
          selected-node="gc.setNode(node)"></div>
 
     <nav ng-show="gc.display('timeline')" class="timeline-nav">
-        <a href="#" ng-dblclick="gc.new_packets(false, true)" ng-click="gc.new_packets(true, false)" ng-show="!gc.isRealTime()">
+        <a href="#" ng-dblclick="gc.setRealTime()" ng-click="gc.newPacket(true)" ng-show="!gc.isRealTime()">
             <img src="{{ static_url('img/refresh.svg') }}" style="height: 12px; padding: 4px 1px;" />
         </a>
-        <a href="#" ng-click="gc.new_packets(false, false)" ng-show="gc.isRealTime()">
+        <a href="#" ng-click="gc.setRealTime()" ng-show="gc.isRealTime()">
             <img src="{{ static_url('img/refresh_over.svg') }}" style="height: 12px; padding: 4px 1px;" />
         </a>
         <a href="#" ng-click="gc.showSetting()">

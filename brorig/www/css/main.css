@@ -499,6 +499,32 @@ svg.timeline {
     margin-left: 55px
 }
 
+#server-config ul li a span.state {
+    float: right;
+}
+
+#server-config ul li a span.state::before {
+    content: attr(data);
+    font-weight: 500;
+    display: block;
+    margin-top: 10px;
+    color: white;
+    padding: 3px 7px;
+    border-radius: 10px;
+    box-shadow: 0px 0px 5px rgba(0, 0, 0, .2) inset;
+    text-shadow: rgba(0,0,0, .2) 0 0 5px;
+    background-color: rgba(200, 200, 200, .5);
+}
+
+#server-config ul li a span.state[data="ON"]::before {
+    background-color: rgba(0, 204, 255, .5);
+}
+
+#server-config ul li a span.state[data="MIX"]::before {
+    content: "OFF";
+    background-color: rgba(255, 150, 0, .5);
+}
+
 
 .timeline-nav {
     position: absolute;

@@ -2,21 +2,20 @@
 
     angular.module('app')
         .service('ServerSelectorService', [
-            '$http', '$websocket',
-            'PageService', 'GraphManager', 'SettingService',
-            ServerSelectorController]);
+            '$http',
+            'PageService', 'AlertService', 'GraphManager', 'ChannelService',
+            ServerServiceController]);
 
-    function ServerSelectorController($http, $websocket, page, gm, ss) {
+    function ServerServiceController($http, page, al, gm, cs) {
 
         var sss = {
             display: true,
             servers: [],
-            lastNetwork: null,
 
             select: function () {
             },
 
-            serverkeySelected: function () {
+            serverKeySelected: function () {
                 var list = [];
                 for (var i in this.servers) {
                     if (this.servers[i].selected) {
@@ -26,67 +25,24 @@
                 return list;
             },
 
-            network: function () {
-                sss.lastNetwork = sss.serverkeySelected();
-                // Clean graph
-                gm.network.graph = {};
-                gm.timeline.graph = {
-                    lanes: [],
-                    packets: []
-                };
-                gm.timeline.display = false;
-                // Ask network graph
-                ws.send(JSON.stringify({
-                    network: sss.lastNetwork
-                }));
-            },
-
-            packetsRequest: function (play, clean) {
-                var startTime = ss.search.filter.historyTime;
-                var stopTime = null;
-                gm.timeline.realTime = play;
-                // Query packets with filers
-                ws.send(JSON.stringify({
-                    timeline: {
-                        filter: {
-                            time: {
-                                start: startTime,
-                                stop: stopTime
-                            }
-                        },
-                        clean: !!clean,
-                        play: play
-                    }
-                }));
-            },
-
             process: function () {
-                var serverlist = sss.serverkeySelected();
-                if (!serverlist.length) {
-                    page.alert.warning("You need to select server !");
+                var server_list = sss.serverKeySelected();
+                if (!server_list.length) {
+                    al.warning("You need to select server !");
                     return false;
                 }
-
-                // Display loading process
+                // Request packet when the network is loaded
+                cs.network.callbacks.push(function () {
+                    gm.packet.request(true);
+                });
+                // Loading progress
                 page.load.display();
-
-                // Callback functions
-                if (!sss.lastNetwork) {
-                    // Ask packets
-                    callbackHandler.network.push(function () {
-                        sss.packetsRequest();
-                        //TODO sss.storage.setId(id);
-                    });
-
-                    // Close all
-                    callbackHandler.packets.push(function () {
-                        page.load.hidden();
-                    });
-                }
-
-                // Ask network
-                sss.network();
-
+                cs.network.callbacks.push(function () {
+                    cs.network.callbacks.pop();
+                    page.load.hidden();
+                });
+                // Ask to load the network graph
+                gm.network.update(server_list);
                 return true;
             },
 
@@ -127,62 +83,8 @@
                 }
             })
             .error(function (data, status) {
-                page.alert.error("Impossible the list of SERVER: " + status);
+                al.error("Impossible the list of SERVER: " + status);
             });
-
-        var ws = $websocket("ws://" + window.location.host + "/ws/network");
-
-        ws.onOpen(function () {
-            console.debug("WebSocket open");
-        });
-
-        ws.onClose(function () {
-            page.alert.error("Connection lost.");
-        });
-
-        ws.onMessage(function (evt) {
-            var data = JSON.parse(evt.data);
-            for (var cmd in data) {
-                if (callbackHandler[cmd]) {
-                    var handlers = callbackHandler[cmd];
-                    var args = data[cmd];
-                    for (var i in handlers) {
-                        handlers[i](args);
-                    }
-                }
-            }
-        });
-
-        var networkDetailCallback = function (data) {
-            gm.uuid = data.uuid;
-        };
-
-        var networkCallback = function (data) {
-            gm.network.graph = data;
-            gm.timeline.display = true;
-        };
-
-        var packetsCallback = function (data) {
-            // Only add new packets and update already in the timeline
-            var num_packet = gm.timeline.graph.packets.length;
-            var old_data = gm.timeline.graph.packets.filter(function (item) {
-                for (var i in data) {
-                    var packet = data[i];
-                    if (packet.uuid == item.uuid) return false;
-                }
-                return true;
-            });
-            gm.timeline.graph.packets = old_data.concat(data);
-            console.info('Add %d and update %d packets in the timeline graph (old:%d, recv:%d, tot:%d)',
-                data.length-(num_packet-old_data.length), num_packet-old_data.length,
-                old_data.length, data.length, gm.timeline.graph.packets.length);
-        };
-
-        var callbackHandler = {
-            "detail": [networkDetailCallback],
-            "network": [networkCallback],
-            "packets": [packetsCallback]
-        };
 
 
         return sss;

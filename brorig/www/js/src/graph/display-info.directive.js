@@ -1,9 +1,9 @@
 (function () {
 
     angular.module('graph')
-        .directive('displayInfoDetail', ["$http", 'GraphManager', displayInfoDetail]);
+        .directive('displayInfoDetail', ["$http", 'ChannelService', displayInfoDetail]);
 
-    function displayInfoDetail($http, gm) {
+    function displayInfoDetail($http, cs) {
         return {
             transclude: true,
             replace: true,
@@ -19,7 +19,7 @@
                         url: "packet",
                         params: {
                             uuid: uuid,
-                            network: gm.uuid
+                            network: cs.client.data.uuid
                         }
                     })
                         .then(function (result) {

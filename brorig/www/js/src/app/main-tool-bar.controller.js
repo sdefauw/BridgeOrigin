@@ -21,6 +21,9 @@
         $scope.serverConfig = function () {
             tab = 'config';
             ServerConfig.display = !ServerConfig.display;
+            if (ServerConfig.display) {
+                ServerConfig.configure.update_status();
+            }
         };
 
         $scope.selectSERVER = function () {

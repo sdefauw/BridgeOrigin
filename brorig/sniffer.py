@@ -20,11 +20,25 @@ class Sniffer:
     def capture_stop(self):
         pass
 
+    def capture_status(self):
+        """
+        Check to capture status
+        :return: true if the capture is currently processed otherwise false
+        """
+        return True
+
     def clean(self):
         pass
 
     def get_packets(self, filter, tmp_dir):
         pass
+
+    def protocol_used(self):
+        """
+        List of all protocol used by this sniffer
+        :return: List of protocol key defined in protocol.json
+        """
+        return []
 
 
 class Packet:
@@ -40,13 +54,13 @@ class Packet:
         self.correlate_key = None
         self.state = Packet.ST_INIT
 
-    def set_src(self, server, time):
+    def set_src(self, server, time=None):
         self.src = {
             "server": server,
             "time": time
         }
 
-    def set_dst(self, server, time):
+    def set_dst(self, server, time=None):
         self.dst = {
             "server": server,
             "time": time

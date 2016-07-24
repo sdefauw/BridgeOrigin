@@ -2,12 +2,12 @@
 
     angular.module('graph')
         .controller('GraphController', [
-            '$scope', '$window', "$http", "$timeout",
+            '$scope', '$window',
             'hotkeys',
-            'GraphManager', 'SettingService', 'ServerSelectorService', 'PageService',
+            'GraphManager', 'SettingService', 'PageService',
             GraphController]);
 
-    function GraphController($scope, $window, $http, $timeout, hotkeys, gm, ss, sss, page) {
+    function GraphController($scope, $window, hotkeys, gm, ss, page) {
 
         var gc = {
 
@@ -55,32 +55,7 @@
                 return $window.innerWidth;
             },
 
-            load: function () {
-                if (sss.serverkeySelected().length == 0) {
-                    $timeout(function () {
-                        gc.load(1);
-                    }, 1000);
-                    return;
-                }
-                var cacheID = sss.storage.getId();
-                if (cacheID) {
-                    $http.get('parse?cache=' + cacheID + '&serverkeys=' + sss.serverkeySelected().join(','))
-                        .success(function (data) {
-                            // Check error
-                            if (data.error) {
-                                console.log(data.error);
-                                return;
-                            }
-                            // Load data file
-                            gm.network.path = data.network;
-                            gm.timeline.path = data.timeline;
-                            gm.data.path = data.datapath;
-                            page.alert.info('Use cache information');
-                        });
-                }
-            },
-
-            new_packets: function (clean, play) {
+            newPacket: function (clean) {
                 // Display loading process
                 page.load.display();
                 // Clean old packets
@@ -89,9 +64,14 @@
                     gm.data.path = null;
                 }
                 // Get new packets
-                sss.packetsRequest(play, clean);
+                gm.packet.request(clean);
                 // Close the loading process
                 page.load.hidden();
+            },
+
+            setRealTime: function () {
+                // Enable or disable real-time packet display
+                gm.packet.realtime();
             },
 
             isRealTime: function () {
@@ -113,7 +93,7 @@
                 combo: 'r',
                 description: 'Refresh the timeline',
                 callback: function() {
-                    gc.new_packets(true);
+                    gc.newPacket(true);
                 }
             })
             .add({
@@ -127,11 +107,7 @@
                 combo: 'space',
                 description: 'Play the realtime check',
                 callback: function() {
-                    if (gc.isRealTime()) {
-                        gc.new_packets(false, false);
-                    } else {
-                        gc.new_packets(false, true);
-                    }
+                    gc.setRealTime();
                 }
             });
         

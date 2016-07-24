@@ -34,10 +34,18 @@ clientsList = None
 
 class MainHandler(tornado.web.RequestHandler):
     def get(self):
-        self.render("index.html", custom_head={
-            "css": ["custom/" + f for f in os.listdir(os.path.join(custom.dir, "www")) if f.endswith(".css")],
-            "js": ["custom/" + f for f in os.listdir(os.path.join(custom.dir, "www")) if f.endswith(".js")]
-        })
+        custom_head = {
+            "css": [],
+            "js": []
+        }
+        dir_path = os.path.join(custom.dir, "www")
+        if os.path.exists(dir_path):
+            dir_www = os.listdir(dir_path)
+            custom_head={
+                "css": ["custom/" + f for f in dir_www if f.endswith(".css")],
+                "js": ["custom/" + f for f in dir_www if f.endswith(".js")]
+            }
+        self.render("index.html", custom_head=custom_head)
 
 
 class NoCacheStaticFileHandler(tornado.web.StaticFileHandler):
@@ -54,34 +62,65 @@ class ServerListHandler(tornado.web.RequestHandler):
                 json.dumps([{"name": s.name, "key": s.key, "group": s.group} for s in custom.server.farm.list()]))
 
 
-class ConfigurationHandler(tornado.web.RequestHandler):
-    def get(self):
-        command = self.get_argument("cmd")
-        server_list = self.get_argument("serverskey").split(",")
-        servers = [s for s in custom.server.farm.list() if str(s.key) in server_list]
+class ConfigurationSnifferHandler(tornado.web.RequestHandler):
+    def __get_server(self, server_list):
+        l = [str(i) for i in server_list]
+        return [s for s in custom.server.farm.list() if str(s.key) in l]
+
+    def __apply_sniffer_action(self, server_list, action):
+        servers = self.__get_server(server_list)
         for server in servers:
             for sniffer in server.sniffers:
-                if command == "config":
-                    log.debug("Configure sniffer %s on %s" % (sniffer.__class__.__name__, server.name))
-                    sniffer.capture_start()
-                if command == "cleanup":
-                    log.debug("Cleanup traces on sniffer %s on %s" % (sniffer.__class__.__name__, server.name))
-                    sniffer.clean()
-        self.set_status(200)
-        self.write("Configured")
+                action(server, sniffer)
+
+    def get(self):
+        servers = self.__get_server(self.get_argument("serverskey").split(','))
+        status = [{'server': server.key, 'enable': sniffer.capture_status()}
+                  for server in servers for sniffer in server.sniffers]
+        self.write(json.dumps(status))
+
+    def delete(self):
+        def action(server, sniffer):
+            log.debug("Cleanup traces on sniffer %s on %s" % (sniffer.__class__.__name__, server.name))
+            sniffer.clean()
+        data = tornado.escape.json_decode(self.request.body)
+        self.__apply_sniffer_action(data['serverskey'], action)
+
+    def put(self, *args, **kwargs):
+        def action(server, sniffer):
+            log.debug("Configure sniffer %s on %s" % (sniffer.__class__.__name__, server.name))
+            if data['enable']:
+                sniffer.capture_start()
+            else:
+                sniffer.capture_stop()
+        data = tornado.escape.json_decode(self.request.body)
+        self.__apply_sniffer_action(data['serverskey'], action)
+
 
 
 class ProtocolHandler(tornado.web.RequestHandler):
     def load_json(self, path):
-        json_data = open(path)
-        protocol = json.load(json_data)
-        json_data.close()
-        return protocol
+        try:
+            json_data = open(path, 'r')
+            protocol = json.load(json_data)
+            json_data.close()
+            return protocol
+        except IOError as e:
+            return {}
 
     def get(self):
-        protocol = self.load_json(custom.dir + "protocol.json")
-        # TODO add default protocol supported
-        self.write(json.dumps(protocol))
+        # Find graph
+        client = self.get_argument("clientID")
+        network = clientsList.find(client).network
+        # Protocol needed
+        p_list = list(set([p for l in network.nodes for s in l.server.sniffers for p in s.protocol_used()]))
+        # Load all protocol description available
+        protocol = self.load_json('www/packet/protocol.json')
+        protocol_custom = self.load_json(custom.dir + "protocol.json")
+        protocol.update(protocol_custom)
+        # Filter to have all detail of protocols needed
+        p = {p: protocol[p] for p in p_list}
+        self.write(json.dumps(p))
 
 
 class PacketHandler(tornado.web.RequestHandler):
@@ -139,6 +178,7 @@ class User:
         self.directory = self.__allocate_directory()
         self.network = None
         self.timeline = None
+        self.timeline_filter = {}
 
     def __allocate_directory(self):
         root_path = config.config['server']['data_path']
@@ -208,24 +248,37 @@ class WebSocketNetworkHandler(tornado.websocket.WebSocketHandler):
         n.start()
 
     def timeline_build(self, config):
-        if not self.timeline_th or not self.timeline_th.isAlive():
-           self.timeline_th = TimelineProcess(self, config)
-        # Set real time environment
-        if 'play' in config:
-            self.timeline_th.real_time = config['play']
-        # Start the process
-        if not self.timeline_th.isAlive():
-            self.timeline_th .start()
-        else:
-            log.info("Timeline thread is running, updating only some information")
+        # Set configuration in the timeline
+        if 'filter' in config:
+            # TODO
+            # use self.client.timeline_filter
+            pass
+        if 'packet' in config:
+            self.client.timeline_filter['time'] = {
+                'start': datetime.datetime.utcfromtimestamp(config['packet']['from']/1000),
+                'stop': datetime.datetime.utcfromtimestamp(config['packet']['to']/1000)
+            }
+        # Execute request
+        if 'play' in config or 'packet' in config:
+            # Configure the helper thread
+            if not self.timeline_th or not self.timeline_th.isAlive():
+                self.timeline_th = TimelinePacketProcessHelper(self, config['clean'], self.client.timeline_filter)
+            # Set real time environment
+            if 'play' in config:
+                self.timeline_th.real_time = config['play']
+            # Start the process
+            if not self.timeline_th.isAlive():
+                self.timeline_th.start()
+            else:
+                log.info("Timeline thread is running, updating only some information")
 
 
-class TimelineProcess(threading.Thread):
-    def __init__(self, ws, data):
+class TimelinePacketProcessHelper(threading.Thread):
+    def __init__(self, ws, clean=False, filter={}):
         threading.Thread.__init__(self)
         self.ws = ws
-        self.filter = data['filter']
-        self.clean_packet = data['clean']
+        self.filter = filter
+        self.clean_packet = clean
         self.real_time = False
         self.transfer_old = True
         self.refresh_interval = config.config["real-time"]["refresh_interval"]
@@ -263,20 +316,30 @@ class TimelineProcess(threading.Thread):
     def run(self):
         if self.real_time:
             # refresh new packet
+            log.info("Start real-time")
+            time.sleep(self.refresh_interval)
+            t = datetime.datetime.now()
+            self.filter['time'] = {
+                'start': t - datetime.timedelta(seconds=self.refresh_interval),
+                'stop': t
+            }
             while self.real_time:
                 t = datetime.datetime.now()
+                # Collect packets
                 self.packet_trigger()
-                delta = datetime.datetime.now() - t
-                d = self.refresh_interval - delta.seconds
+                # Compute next time
+                now = datetime.datetime.now()
+                d = self.refresh_interval - (now - t).seconds
                 if d < 0:
                     log.warning("Real time issue: time to process data takes more time to refresh")
                 else:
                     time.sleep(d)
                 # Adapt the filter for the next iteration
                 self.filter['time'] = {
-                    'start': d + 1,
-                    'stop': None
+                    'start': t,
+                    'stop': datetime.datetime.now()
                 }
+            log.info("End of real-time")
         else:
             # Inform only new packet
             self.packet_trigger()
@@ -338,7 +401,7 @@ class Application(tornado.web.Application):
             (r"/server/list", ServerListHandler),
             (r"/ws/network", WebSocketNetworkHandler),
             (r"/packet", PacketHandler),
-            (r"/configure", ConfigurationHandler),
+            (r"/configure/sniffer", ConfigurationSnifferHandler),
             (r'/protocol', ProtocolHandler),
             (r"/custom/(.*)", tornado.web.StaticFileHandler, {"path": os.path.join(custom.dir, "www")}),
             (r"/include/(.*)", tornado.web.StaticFileHandler, {"path": os.path.join(os.path.dirname(__file__), "www")}),
