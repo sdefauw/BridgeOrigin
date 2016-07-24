@@ -2,11 +2,11 @@ import server
 import config
 import connectivity
 import pcap_sniffer
-
+import log
 
 class Server(server.ServerIP):
     def __init__(self, key, name, cluster, group):
-        server.Server.__init__(self, key, name, cluster)
+        server.ServerIP.__init__(self, key, name, cluster)
         self.group = group
         self.sniffers = [
             pcap_sniffer.PcapRemoteSniffer(server=self, protocols=['HTTP'], ports=[80])
@@ -15,6 +15,10 @@ class Server(server.ServerIP):
     def set_ssh_info(self, hostname, user, passwd):
         self.hostname = hostname
         self.ssh_connection = connectivity.Connection(self.hostname, user, passwd)
+
+    def connectivity(self, full=False):
+        # remove loopback connectivity
+        return [ip for ip in server.ServerIP.connectivity(self, full) if ip != "127.0.0.1"]
 
     def remote_connectivity(self):
         """
@@ -38,11 +42,24 @@ class Server(server.ServerIP):
         return connection_list
 
 
+class VagrantServer(Server):
+    def __init__(self, key, name, cluster, group):
+        Server.__init__(self, key, name, cluster, group)
+
+    def remote_connectivity(self):
+        # Remove 10.0.2.15 connectivity
+        return [i for i in Server.remote_connectivity(self) if i['conn'] != "10.0.2.15"]
+
+
 class Farm(server.Farm):
     def __init__(self):
         server.Farm.__init__(self)
         self.clusters = []
         self.servers = []
+        self.type_of_server_available = {
+            "basic": Server,
+            "vagrant": VagrantServer
+        }
 
     def list(self):
         """
@@ -56,6 +73,7 @@ class Farm(server.Farm):
                 "cluster": <name_of_cluster_defined>,
                 "group": <group_id>,
                 "hostname": <server_hostanme>,
+                "type": basic|vagrant
                 "ssh": {
                     "user": <login_user>,
                     "passwd": <user_password>
@@ -73,7 +91,12 @@ class Farm(server.Farm):
             return self.servers
         self.clusters = [server.Cluster(c["name"]) for c in config.config["farm"]["clusters"]]
         for s in config.config["farm"]["servers"]:
-            s_obj = Server(s["key"], s["name"], [c for c in self.clusters if c.name == s["cluster"]][0], s["group"])
+            if 'type' not in s["type"] and s["type"] not in self.type_of_server_available:
+                serverClass = self.type_of_server_available["basic"]
+                log.warning("Type of server undefined: using basic sever by default")
+            else:
+                serverClass = self.type_of_server_available[s["type"]]
+            s_obj = serverClass(s["key"], s["name"], [c for c in self.clusters if c.name == s["cluster"]][0], s["group"])
             s_obj.set_ssh_info(s["hostname"], s["ssh"]["user"], s["ssh"]["passwd"])
             self.servers.append(s_obj)
         for s in self.servers:

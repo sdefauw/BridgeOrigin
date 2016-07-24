@@ -74,7 +74,6 @@ class PcapRemoteSniffer(PcapFileSniffer):
         return stdout == "0\n"
 
     def get_packets(self, filter, tmp_dir):
-        # TODO transfert the pcap trace to the main server
         transfer_path = "/tmp/brorig_transfer.pcap"
         local_path = os.path.join(tmp_dir, "log/pcap/")
         # Shrink the pcap trace base on the filter
