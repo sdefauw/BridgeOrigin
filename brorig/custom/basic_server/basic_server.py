@@ -8,15 +8,8 @@ class Server(server.ServerIP):
     def __init__(self, key, name, cluster, group):
         server.Server.__init__(self, key, name, cluster)
         self.group = group
-
-        def cat_http_fun(p_http):
-            if hasattr(p_http, 'request_method'):
-                return p_http.request_method
-            if hasattr(p_http, 'response_code'):
-                return p_http.response_code
-            return None
         self.sniffers = [
-            pcap_sniffer.PcapRemoteSniffer(server=self, protocol='http', category_fun=cat_http_fun, ports=[80])
+            pcap_sniffer.PcapRemoteSniffer(server=self, protocols=['HTTP'], ports=[80])
         ]
 
     def set_ssh_info(self, hostname, user, passwd):

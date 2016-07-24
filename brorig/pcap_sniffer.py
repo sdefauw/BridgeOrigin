@@ -10,17 +10,21 @@ import log
 
 
 class PcapFileSniffer(sniffer.Sniffer):
-    def __init__(self, server, protocol, category_fun, conn_layer='ip'):
+    def __init__(self, server, protocols, conn_layer='ip'):
         sniffer.Sniffer.__init__(self, server)
         self.connectivity_layer = conn_layer
-        self.protocol = protocol
-        self.prot_cat = category_fun
+        self.protocols = protocols
 
     def __process_cap(self, cap):
         for packet in cap:
-            if self.protocol not in packet:
+            matched_proto = [p for p in self.protocols if p in protocol_supported and protocol_supported[p]['pcap_link'] in packet]
+            if len(matched_proto) != 1:
                 continue
-            p = CapPacket(packet[self.protocol], self.protocol, self.prot_cat(eval("packet.%s" % self.protocol)))
+            protocol_name = matched_proto[0]
+            protocol_link = protocol_supported[protocol_name]
+            cat_fun = protocol_link['category']
+            packet_type = protocol_link['packet']
+            p = packet_type(packet[protocol_name], protocol_name, cat_fun(eval("packet.%s" % protocol_link['pcap_link'])))
             src = packet[self.connectivity_layer].src
             dst = packet[self.connectivity_layer].dst
             time = datetime.datetime.utcfromtimestamp(float(packet.sniff_timestamp))
@@ -41,12 +45,12 @@ class PcapFileSniffer(sniffer.Sniffer):
         self.__process_cap(cap)
 
     def protocol_used(self):
-        return [self.protocol]
+        return self.protocols
 
 
 class PcapRemoteSniffer(PcapFileSniffer):
-    def __init__(self, server, protocol, category_fun, conn_layer='ip', ports=None, filter=None):
-        PcapFileSniffer.__init__(self, server, protocol, category_fun, conn_layer)
+    def __init__(self, server, protocols, conn_layer='ip', ports=None, filter=None):
+        PcapFileSniffer.__init__(self, server, protocols, conn_layer)
         self.ports = ports
         self.filter = filter
         self.remote_file_path = "/tmp/brorig.pcap"
@@ -103,10 +107,41 @@ class CapPacket(sniffer.Packet):
     def equals(self, other):
         if not isinstance(other, CapPacket):
             return False
-        # TODO too CPU computation
+        # WARNING too CPU computation
         return str(self.packet) == str(other.packet)
 
     def template(self):
         return ("packet.html", {
             "packet": self.packet
         })
+
+
+class HttpPacket(CapPacket):
+    def __init__(self, packet, protocol, category):
+        CapPacket.__init__(self, packet, protocol, category)
+
+    def equals(self, other):
+        if not isinstance(other, HttpPacket):
+            return False
+        if hasattr(self.packet, 'request_method') and hasattr(other.packet, 'request_method'):
+            # TODO not reliable
+            return self.packet.request_method == other.packet.request_method and self.packet.request_uri == other.packet.request_uri and self.packet.request_method == other.packet.request_method and self.packet.host == other.packet.host
+        if hasattr(self.packet, 'response_code') and hasattr(other.packet, 'response_code'):
+            return self.packet.response_code == other.packet.response_code and self.packet.date == other.packet.date
+        return False
+
+
+def cat_http_fun(p_http):
+    if hasattr(p_http, 'request_method'):
+        return p_http.request_method
+    if hasattr(p_http, 'response_code'):
+        return p_http.response_code
+    return None
+
+protocol_supported = {
+    'HTTP': {
+        'pcap_link': 'http',
+        'packet': HttpPacket,
+        'category': cat_http_fun
+    }
+}
