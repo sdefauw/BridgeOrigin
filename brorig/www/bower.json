@@ -12,14 +12,14 @@
     "**/.*",
     "node_modules",
     "bower_components",
-    "js/libs",
+    "libs",
     "test",
     "tests"
   ],
   "dependencies": {
-    "angular": "angularjs#~1.4.8",
-    "d3": "~3.5.10",
-    "angular-websocket": "~1.0.14",
+    "angular": "angularjs#^1.5.8",
+    "d3": "^3.5.17",
+    "angular-websocket": "^2.0.0",
     "angular-hotkeys": "chieffancypants/angular-hotkeys#^1.7.0"
   }
 }

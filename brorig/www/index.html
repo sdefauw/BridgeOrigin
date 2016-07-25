@@ -1,28 +1,28 @@
 {% extends "base.html" %}
 
 {% block jshead %}
-<script src="{{ static_url('js/src/app/app.js') }}"></script>
-<script src="{{ static_url('js/src/app/alert.controller.js') }}"></script>
-<script src="{{ static_url('js/src/app/alert.service.js') }}"></script>
-<script src="{{ static_url('js/src/app/loading.controller.js') }}"></script>
-<script src="{{ static_url('js/src/app/main-tool-bar.controller.js') }}"></script>
-<script src="{{ static_url('js/src/app/page.controller.js') }}"></script>
-<script src="{{ static_url('js/src/app/page.service.js') }}"></script>
-<script src="{{ static_url('js/src/app/server-config.controller.js') }}"></script>
-<script src="{{ static_url('js/src/app/server-config.service.js') }}"></script>
-<script src="{{ static_url('js/src/app/server-selector.controller.js') }}"></script>
-<script src="{{ static_url('js/src/app/server-selector.service.js') }}"></script>
+<script src="{{ static_url('js/app/app.js') }}"></script>
+<script src="{{ static_url('js/app/alert.controller.js') }}"></script>
+<script src="{{ static_url('js/app/alert.service.js') }}"></script>
+<script src="{{ static_url('js/app/loading.controller.js') }}"></script>
+<script src="{{ static_url('js/app/main-tool-bar.controller.js') }}"></script>
+<script src="{{ static_url('js/app/page.controller.js') }}"></script>
+<script src="{{ static_url('js/app/page.service.js') }}"></script>
+<script src="{{ static_url('js/app/server-config.controller.js') }}"></script>
+<script src="{{ static_url('js/app/server-config.service.js') }}"></script>
+<script src="{{ static_url('js/app/server-selector.controller.js') }}"></script>
+<script src="{{ static_url('js/app/server-selector.service.js') }}"></script>
 
-<script src="{{ static_url('js/src/graph/graph.js') }}"></script>
-<script src="{{ static_url('js/src/graph/channel.service.js') }}"></script>
-<script src="{{ static_url('js/src/graph/display-info.controller.js') }}"></script>
-<script src="{{ static_url('js/src/graph/display-info.directive.js') }}"></script>
-<script src="{{ static_url('js/src/graph/graph.controller.js') }}"></script>
-<script src="{{ static_url('js/src/graph/manager.service.js') }}"></script>
-<script src="{{ static_url('js/src/graph/network.directive.js') }}"></script>
-<script src="{{ static_url('js/src/graph/setting.controller.js') }}"></script>
-<script src="{{ static_url('js/src/graph/setting.service.js') }}"></script>
-<script src="{{ static_url('js/src/graph/timeline.directive.js') }}"></script>
+<script src="{{ static_url('js/graph/graph.js') }}"></script>
+<script src="{{ static_url('js/graph/channel.service.js') }}"></script>
+<script src="{{ static_url('js/graph/display-info.controller.js') }}"></script>
+<script src="{{ static_url('js/graph/display-info.directive.js') }}"></script>
+<script src="{{ static_url('js/graph/graph.controller.js') }}"></script>
+<script src="{{ static_url('js/graph/manager.service.js') }}"></script>
+<script src="{{ static_url('js/graph/network.directive.js') }}"></script>
+<script src="{{ static_url('js/graph/setting.controller.js') }}"></script>
+<script src="{{ static_url('js/graph/setting.service.js') }}"></script>
+<script src="{{ static_url('js/graph/timeline.directive.js') }}"></script>
 
 {% for js_file in custom_head["js"] %}
 <link rel="stylesheet" type="text/css" href="{{ js_file }}">
