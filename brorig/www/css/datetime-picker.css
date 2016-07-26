@@ -1,0 +1,63 @@
+@font-face {
+    font-family:'Glyphicons Halflings';
+    src: url("../font/glyphicons-halflings-regular.woff");
+}
+
+
+.datetime-picker-dropdown {
+    left: 0;
+    background: white;
+    margin: 0;
+    position: absolute;
+    border: 1px solid rgba(200, 200, 200, .5);
+}
+.datetime-picker-dropdown li {
+    text-decoration: none;
+}
+
+.datetime-picker-dropdown em {
+    color: rgba(200, 200, 200, 0.75);
+}
+
+.datetime-picker-dropdown a:focus,
+.datetime-picker-dropdown table:focus {
+    outline: none;
+}
+
+.datetime-picker-dropdown > li.date-picker-menu div > table .btn-default {
+    border: 0;
+}
+
+.datetime-picker-dropdown > li.time-picker-menu div > table {
+
+}
+
+.datetime-picker-dropdown .pull-right {
+    float: right!important;
+}
+.datetime-picker-dropdown .btn-group, .btn-group-vertical {
+    position: relative;
+    display: inline-block;
+    vertical-align: middle;
+}
+
+.datetime-picker-dropdown .glyphicon {
+    position: relative;
+    display: inline-block;
+    font-family: 'Glyphicons Halflings';
+    font-style: normal;
+    font-weight: 100;
+}
+
+.glyphicon-chevron-left:before {
+    content: "\e079";
+}
+.datetime-picker-dropdown .glyphicon-chevron-right:before {
+    content: "\e080";
+}
+.glyphicon-chevron-up:before {
+    content: "\e113";
+}
+.glyphicon-chevron-down:before {
+    content: "\e114";
+}

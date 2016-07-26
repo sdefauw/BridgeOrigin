@@ -30,5 +30,13 @@
             <select name="tfilter" id="tfilter" ng-model="sc.tfilter" ng-change="sc.tfilterSelect()" ng-options="opt as opt.label for opt in sc.timeFilterOptions">
             </select>
         </section>
+        <div class="col-sm-10">
+            <p class="input-group">
+                <input type="text" class="form-control" datetime-picker ng-model="sc.picker.date" is-open="sc.picker.open" button-bar="sc.picker.buttonBar" />
+                <span class="input-group-btn">
+                      <button type="button" class="btn btn-default" ng-click="sc.openCalendar($event, 'picker')">C</button>
+                  </span>
+            </p>
+        </div>
     </div>
 </div>

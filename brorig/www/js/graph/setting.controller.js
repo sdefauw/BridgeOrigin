@@ -21,6 +21,42 @@
                 {label: 'All log', value: ''}
             ],
 
+            picker : {
+                date: new Date(),
+                open: true,
+                buttonBar: {
+                    show: true,
+                    now: {
+                        show: true,
+                        text: 'Now'
+                    },
+                    today: {
+                        show: true,
+                        text: 'Today'
+                    },
+                    clear: {
+                        show: false,
+                        text: 'Clear'
+                    },
+                    date: {
+                        show: true,
+                        text: 'Date'
+                    },
+                    time: {
+                        show: true,
+                        text: 'Time'
+                    },
+                    close: {
+                        show: false,
+                        text: 'Close'
+                    }
+                }
+            },
+
+            openCalendar : function(e, picker) {
+                setting.picker.open = true;
+            },
+
             show: function () {
                 return ss.display;
             },
