@@ -1,8 +1,30 @@
 @font-face {
-    font-family:'Glyphicons Halflings';
-    src: url("../font/glyphicons-halflings-regular.woff");
+    font-family:'Ionicons';
+    src: url("../font/ionicons.woff");
 }
 
+.datetime-picker-group .input-group-btn button {
+    border-radius: 0;
+    background: white;
+    border: solid 1px rgba(200, 200, 200, .5);
+}
+
+.datetime-picker-group .input-group-btn button:before {
+    font-family: 'Ionicons';
+    content: "\f26e";
+    font-size: 14px;
+}
+
+.datetime-picker-group input.main {
+    border-radius: 0 !important;
+    display: table-cell !important;
+    width: 100% !important;
+}
+
+.datetime-picker-group:hover input.main,
+.datetime-picker-group:hover .input-group-btn button {
+    border-color: rgba(0, 204, 255, .75);
+}
 
 .datetime-picker-dropdown {
     left: 0;
@@ -13,10 +35,16 @@
 }
 .datetime-picker-dropdown li {
     text-decoration: none;
+    display: block;
+    margin-top: 10px;
 }
 
 .datetime-picker-dropdown em {
     color: rgba(200, 200, 200, 0.75);
+}
+
+.datetime-picker-dropdown input {
+    width: 20px !important;
 }
 
 .datetime-picker-dropdown a:focus,
@@ -28,8 +56,8 @@
     border: 0;
 }
 
-.datetime-picker-dropdown > li.time-picker-menu div > table {
-
+.datetime-picker-dropdown table.uib-timepicker td {
+    text-align: center;
 }
 
 .datetime-picker-dropdown .pull-right {
@@ -44,20 +72,40 @@
 .datetime-picker-dropdown .glyphicon {
     position: relative;
     display: inline-block;
-    font-family: 'Glyphicons Halflings';
+    font-family: 'Ionicons';
     font-style: normal;
     font-weight: 100;
 }
 
 .glyphicon-chevron-left:before {
-    content: "\e079";
+    content: "\f124";
 }
-.datetime-picker-dropdown .glyphicon-chevron-right:before {
-    content: "\e080";
+.glyphicon-chevron-right:before {
+    content: "\f125";
 }
 .glyphicon-chevron-up:before {
-    content: "\e113";
+    content: "\f126";
 }
 .glyphicon-chevron-down:before {
-    content: "\e114";
+    content: "\f123";
+}
+
+.input-group {
+    position: relative;
+    display: table;
+    border-collapse: separate;
+}
+
+.input-group-btn {
+    position: relative;
+    font-size: 0;
+    white-space: nowrap;
+}
+.input-group-addon, .input-group-btn {
+    width: 1%;
+    white-space: nowrap;
+    vertical-align: middle;
+}
+.input-group-addon, .input-group-btn, .input-group .form-control {
+    display: table-cell;
 }
