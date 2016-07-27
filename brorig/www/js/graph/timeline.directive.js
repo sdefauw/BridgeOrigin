@@ -198,9 +198,11 @@
                 height = scope.height - margin.top - margin.bottom,
                 titleWidth = 150;
 
-            if (!domain)
-            //TODO add a default domain (range scheduled)
-                domain = [new Date(new Date() - ss.search.filter.historyTime * 1000), new Date()];
+            if (!domain) {
+                //TODO add a default domain (range scheduled)
+                var interval = ss.search.filter.time.interval();
+                domain = [interval.from, interval.to];
+            }
 
             if(!x)
                 x = d3.time.scale()

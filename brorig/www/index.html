@@ -31,6 +31,8 @@
 {% end %}
 
 {% block csshead %}
+<link rel="stylesheet" type="text/css" href="{{ static_url('css/gsetting.css') }}">
+<link rel="stylesheet" type="text/css" href="{{ static_url('css/datetime-picker.css') }}">
 
 {% for css_file in custom_head["css"] %}
 <link rel="stylesheet" type="text/css" href="{{ css_file }}">

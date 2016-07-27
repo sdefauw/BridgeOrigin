@@ -25,10 +25,35 @@
 
     <div ng-show="sc.isActiveMenu('search')">
         <h1>Time processing interval</h1>
-        <section>
-            <label for="tfilter">Duration until now</label>
-            <select name="tfilter" id="tfilter" ng-model="sc.tfilter" ng-change="sc.tfilterSelect()" ng-options="opt as opt.label for opt in sc.timeFilterOptions">
-            </select>
+        <section class="time-interval">
+            <label class="radio">
+                <input type="radio" ng-model="sc.timeSelection" value="until_now">
+                <label for="tfilter">Duration until now</label>
+                <select name="tfilter" id="tfilter" ng-model="sc.tfilter" ng-change="sc.tfilterSelect()" ng-options="opt as opt.label for opt in sc.timeFilterOptions" style="font-size: 11px;">
+                </select>
+            </label>
+            <label class="radio" style="display: inline-flex;">
+                <input type="radio" ng-model="sc.timeSelection" value="from_to">
+                <span class="fromto">
+                    From:
+                    <p class="datetime-picker-group input-group">
+                        <input type="text" class="form-control main" datetime-picker ng-model="sc.pickers.from.date" is-open="sc.pickers.from.open" button-bar="sc.pickers.from.buttonBar" ng-change="sc.pickerSelect()"  />
+                        <span class="input-group-btn">
+                            <button type="button" class="btn btn-default" ng-click="sc.openCalendar($event, 'from')"></button>
+                        </span>
+                    </p>
+                </span>
+                <span class="fromto">
+                    To:
+                    <p class="datetime-picker-group input-group">
+                        <input type="text" class="form-control main" datetime-picker ng-model="sc.pickers.to.date" is-open="sc.pickers.to.open" button-bar="sc.pickers.to.buttonBar" ng-change="sc.pickerSelect()"  />
+                        <span class="input-group-btn">
+                            <button type="button" class="btn btn-default" ng-click="sc.openCalendar($event, 'to')"></button>
+                        </span>
+                    </p>
+                </span>
+            </label>
         </section>
+
     </div>
 </div>
