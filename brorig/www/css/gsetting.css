@@ -1,0 +1,101 @@
+
+#gsetting {
+    width: 600px;
+    height: 300px;
+    margin: -150px 0 0 -300px;
+}
+
+#gsetting h1,
+#gsetting h2,
+#gsetting h3 {
+    font-weight: 200;
+    display: block;
+}
+
+#gsetting h1 {
+    font-size: 14px;
+    font-weight: 400;
+    margin: 5px 0;
+}
+
+#gsetting h2 {
+    font-size: 13px;
+    font-weight: 300;
+    margin: 5px 0;
+}
+
+#gsetting section {
+    margin-left: 5px;
+}
+
+#gsetting ul.filterbox {
+    display: block;
+    overflow: auto;
+    max-height: 200px;
+}
+
+#gsetting ul.filterbox li {
+    display: block;
+    float: left;
+    border: solid 1px rgba(200, 200, 200, .5);
+    margin: 3px 5px;
+}
+
+#gsetting ul.filterbox li span {
+    display: block;
+    color: rgb(150, 150, 150);
+    line-height: 20px;
+    text-align: center;
+    vertical-align: middle;
+    padding: 0 15px;
+    cursor: default;
+}
+
+#gsetting ul.filterbox li img {
+    display: none;
+    float: right;
+    cursor: pointer;
+    margin: 6px 3px;
+    height: 7px;
+}
+
+#gsetting ul.filterbox li:hover span {
+    padding: 0 20px 0 10px;
+}
+
+#gsetting ul.filterbox li:hover img {
+    display: block;
+}
+
+#gsetting input[type="text"] {
+    display: block;
+    padding: 0 10px;
+    color: rgb(150, 150, 150);
+    border: solid 1px rgba(200, 200, 200, .5);
+    height: 20px;
+    width: 125px;
+    margin: 5px auto;
+    border-radius: 10px;
+    background: none;
+}
+
+#gsetting input[type="text"]:hover,
+#gsetting input[type="text"]:focus {
+    border-color: rgba(0, 204, 255, .75);
+    outline: none;
+}
+
+
+#gsetting .time-interval label.radio {
+    display: block;
+    margin: 10px 0;
+}
+
+#gsetting .datetime-picker-group {
+    width: 150px;
+    margin: 0 15px;
+}
+
+#gsetting .time-interval span.fromto  {
+    margin-left: 5px;
+}

@@ -2,10 +2,10 @@
 
     angular.module('graph')
         .factory('GraphManager', [
-            "SettingService", "ChannelService",
+            "SettingService", "ChannelService", 'AlertService',
             GraphManager]);
 
-    function GraphManager(ss, cs) {
+    function GraphManager(ss, cs, al) {
 
         var gm =  {
             data: {
@@ -32,9 +32,12 @@
             },
             packet: {
                 request: function (clean) {
-                    var now = new Date() - 0;
-                    var from = now - ss.search.filter.historyTime * 1000;
-                    cs.packet.request(from, now, clean);
+                    var interval = ss.search.filter.time.interval();
+                    if (!interval) {
+                        al.error("Invalid time interval selected");
+                        return;
+                    }
+                    cs.packet.request(interval.from.getTime(), interval.to.getTime(), clean);
                 },
                 realtime: function () {
                     gm.timeline.realTime = !gm.timeline.realTime;

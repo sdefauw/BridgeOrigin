@@ -56,6 +56,11 @@
     border: 0;
 }
 
+.datetime-picker-dropdown .btn-default.active {
+    border: solid 1px rgba(0, 204, 255, .75) !important;
+    color: rgba(0, 204, 255, .75);
+}
+
 .datetime-picker-dropdown table.uib-timepicker td {
     text-align: center;
 }

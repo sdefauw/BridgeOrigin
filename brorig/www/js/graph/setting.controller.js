@@ -11,50 +11,28 @@
                 selected: "filter"
             },
             timeFilterOptions: [
+                {label: '30 s', value: 30},
                 {label: '1 min', value: 60},
                 {label: '5 min', value: 5 * 60},
                 {label: '15 min', value: 15 * 60},
                 {label: '30 min', value: 30 * 60},
-                {label: '1 h', value: 60 * 60},
-                {label: '5 h', value: 5 * 60},
-                {label: '10 h', value: 10 * 60},
-                {label: 'All log', value: ''}
+                {label: '1 h', value: 60 * 60}
             ],
-
-            picker : {
-                date: new Date(),
-                open: true,
-                buttonBar: {
-                    show: true,
-                    now: {
-                        show: true,
-                        text: 'Now'
-                    },
-                    today: {
-                        show: true,
-                        text: 'Today'
-                    },
-                    clear: {
-                        show: false,
-                        text: 'Clear'
-                    },
-                    date: {
-                        show: true,
-                        text: 'Date'
-                    },
-                    time: {
-                        show: true,
-                        text: 'Time'
-                    },
-                    close: {
-                        show: false,
-                        text: 'Close'
-                    }
+            timeSelection: "until_now",
+            pickers: {
+                from: {
+                    date: new Date(),
+                    open: false
+                },
+                to:{
+                    date: new Date(),
+                    open: false
                 }
             },
 
             openCalendar : function(e, picker) {
-                setting.picker.open = true;
+                setting.timeSelection = 'from_to';
+                setting.pickers[picker].open = true;
             },
 
             show: function () {
@@ -70,7 +48,15 @@
             },
 
             tfilterSelect: function () {
-                ss.search.filter.historyTime = setting.tfilter.value;
+                setting.timeSelection = 'until_now';
+                ss.search.filter.time.from = -setting.tfilter.value;
+                ss.search.filter.time.to = null;
+            },
+
+            pickerSelect: function () {
+                setting.timeSelection = 'from_to';
+                ss.search.filter.time.from = setting.pickers.from.date;
+                ss.search.filter.time.to = setting.pickers.to.date;
             },
 
             filtersAvailable: function () {
@@ -112,6 +98,38 @@
         };
 
         setting['tfilter'] = setting.timeFilterOptions[1];
+        setting.tfilterSelect();
+
+        // Date time picker configuration
+        setting.pickers.from.buttonBar = {
+            show: true,
+                now: {
+                show: true,
+                    text: 'Now'
+            },
+            today: {
+                show: true,
+                    text: 'Today'
+            },
+            clear: {
+                show: false,
+                    text: 'Clear'
+            },
+            date: {
+                show: true,
+                    text: 'Date'
+            },
+            time: {
+                show: true,
+                    text: 'Time'
+            },
+            close: {
+                show: false,
+                    text: 'Close'
+            }
+        };
+        setting.pickers.to.buttonBar = setting.pickers.from.buttonBar;
+        setting.pickers.from.date.setSeconds(setting.pickers.from.date.getSeconds() - setting.tfilter.value);
 
         return setting;
     }
