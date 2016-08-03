@@ -10,6 +10,7 @@ out/
 *.gen
 generator/data/
 brorig/data/
+brorig/www/libs/
 config/
 
 # Byte-compiled / optimized / DLL files
