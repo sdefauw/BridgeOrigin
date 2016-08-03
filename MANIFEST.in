@@ -1,3 +1,3 @@
-include acdb/script/*.pm
-include acdb/config.json.template
-recursive-include acdb/www *.*
+include brorig/config.json.template
+recursive-include brorig/www *.*
+recursive-include brorig/custom *.*
