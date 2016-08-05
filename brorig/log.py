@@ -96,7 +96,8 @@ def init(verbosity):
 
 
 logging.setLoggerClass(ColoredLogger)
-logger = logging.getLogger("WebUI")
+logger = logging.getLogger("brorig")
+logging.getLogger("tornado.access").propagate = False
 
 # Use approach of Pika, allows for log.debug("message")
 debug = logger.debug
