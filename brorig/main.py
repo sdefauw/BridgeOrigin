@@ -6,10 +6,10 @@ import sys
 
 import pkg_resources
 
-import config
-import log
-import webserver
-import custom
+import brorig.config as config
+import brorig.log as log
+import brorig.webserver as webserver
+import brorig.custom as custom
 
 
 def signal_handler(signal, frame):

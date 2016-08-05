@@ -1,8 +1,10 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-import config
-import log
+from __future__ import absolute_import, division, print_function
+
+import brorig.config as config
+import brorig.log as log
 
 server = None
 
@@ -13,7 +15,7 @@ def load():
     global server, dir
     customer_import = None
     try:
-        customer_import = __import__("custom." + config.config["custom"]["server"], fromlist=[''])
+        customer_import = __import__("brorig.custom." + config.config["custom"]["server"], fromlist=[''])
         log.info("Custom %s loaded" % config.config["custom"]["server"])
     except Exception as e:
         log.critical("Impossible to load the custom server")

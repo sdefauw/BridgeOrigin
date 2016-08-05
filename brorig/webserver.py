@@ -1,5 +1,8 @@
 #!/usr/bin/env python
 # coding: utf-8
+
+from __future__ import absolute_import, division, print_function
+
 import base64
 import gc
 import json
@@ -21,12 +24,12 @@ import tornado.options
 import tornado.web
 import tornado.websocket
 
-import config
-import custom
-import log
-import network
-import timeline
-import sniffer
+import brorig.config as config
+import brorig.custom as custom
+import brorig.log as log
+import brorig.network as network
+import brorig.timeline as timeline
+import brorig.sniffer as sniffer
 
 threadServer = None
 

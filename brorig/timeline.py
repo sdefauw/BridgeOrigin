@@ -1,11 +1,13 @@
 #!/usr/bin/env python
 # coding: utf-8
 
+from __future__ import absolute_import, division, print_function
+
 import gc
 import threading
 
-import log
-from sniffer import Packet
+import brorig.log as log
+from brorig.sniffer import Packet
 
 
 class Timeline:

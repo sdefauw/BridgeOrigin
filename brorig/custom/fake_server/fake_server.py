@@ -5,9 +5,9 @@ import datetime
 import time
 import random
 
-import server
-import sniffer
-import log
+import brorig.server as server
+import brorig.sniffer as sniffer
+import brorig.log as log
 
 
 class Server(server.Server):

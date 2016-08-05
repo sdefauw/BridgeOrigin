@@ -1,8 +1,13 @@
-import server
-import config
-import connectivity
-import pcap_sniffer
-import log
+#!/usr/bin/env python
+# coding: utf-8
+
+from __future__ import absolute_import, division, print_function
+
+import brorig.server as server
+import brorig.config as config
+import brorig.connectivity as connectivity
+import brorig.pcap_sniffer as pcap_sniffer
+import brorig.log as log
 
 class Server(server.ServerIP):
     def __init__(self, key, name, cluster, group):

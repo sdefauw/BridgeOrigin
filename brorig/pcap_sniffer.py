@@ -1,12 +1,17 @@
+#!/usr/bin/env python
+# coding: utf-8
+
+from __future__ import absolute_import, division, print_function
+
 import pyshark
 import os
 import re
 import datetime
 
-import custom
-import sniffer
-import connectivity
-import log
+import brorig.custom as custom
+import brorig.sniffer as sniffer
+import brorig.connectivity as connectivity
+import brorig.log as log
 
 
 class PcapFileSniffer(sniffer.Sniffer):

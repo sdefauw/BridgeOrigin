@@ -1,9 +1,11 @@
 #!/usr/bin/env python
 # coding: utf-8
 
+from __future__ import absolute_import, division, print_function
+
 import re
 
-import connectivity
+import brorig.connectivity as connectivity
 
 
 class Server:
