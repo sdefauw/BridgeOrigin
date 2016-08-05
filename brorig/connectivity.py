@@ -1,11 +1,14 @@
 #!/usr/bin/env python
 # coding: utf-8
-import subprocess
 
+from __future__ import absolute_import, division, print_function
+
+import subprocess
 import pymysql
-import log
-import config
 import paramiko
+
+import brorig.log as log
+import brorig.config as config
 
 
 def db_connect_start():
