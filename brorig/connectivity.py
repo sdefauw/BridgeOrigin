@@ -64,7 +64,7 @@ class Transfer:
 
 
 class Script:
-    def __init__(self, connection, exe_remote=True, code="", interpret="sh", sudo=False,
+    def __init__(self, connection, exe_remote=True, code="", interpret="bash", sudo=False,
                  ignore_error=False):
         self.connection = connection
         self.interpret = interpret
@@ -102,7 +102,7 @@ class Script:
             starter_script = "sudo " + starter_script
         cmd = starter_script + ' ' + path_script
         cmd += ((" " + (
-            " ".join(["--" + str(arg) + " " + str(val) for arg, val in
+            " ".join([("-" if len(str(arg)) == 1 else "--") + str(arg) + " " + str(val) for arg, val in
                       self.args.iteritems()]))) if self.args != {} else "")
         if self.exe_remote:
             log.info("Remote command execution: %s" % cmd)
