@@ -74,6 +74,22 @@
                 gm.packet.realtime();
             },
 
+            timelineLoading: function () {
+                return gm.packet.loading;
+            },
+
+            refresh_action: function(dbclick) {
+                if (dbclick) {
+                    gc.setRealTime();
+                    return;
+                }
+                if (gc.isRealTime()) {
+                    gc.setRealTime();
+                    return;
+                }
+                gc.newPacket(true);
+            },
+
             isRealTime: function () {
                 return gm.timeline.realTime;
             },

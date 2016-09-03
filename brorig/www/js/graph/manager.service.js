@@ -31,12 +31,14 @@
                 }
             },
             packet: {
+                loading: false,
                 request: function (clean) {
                     var interval = ss.search.filter.time.interval();
                     if (!interval) {
                         al.error("Invalid time interval selected");
                         return;
                     }
+                    gm.packet.loading = true;
                     cs.packet.request(interval.from.getTime(), interval.to.getTime(), clean);
                 },
                 realtime: function () {
@@ -89,6 +91,7 @@
             console.info('Add %d and update %d packets in the timeline graph (old:%d, recv:%d, tot:%d)',
                 data.length-(num_packet-old_data.length), num_packet-old_data.length,
                 old_data.length, data.length, gm.timeline.graph.packets.length);
+            gm.packet.loading = false;
         });
 
         return gm;

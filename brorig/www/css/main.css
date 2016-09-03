@@ -455,6 +455,27 @@ svg.timeline {
     vertical-align: middle;
     text-align: center;
 }
+.timeline-nav svg.loading path{
+    stroke-dasharray: 10 10;
+    stroke-dashoffset: 50;
+    animation: loading_move 1s infinite;
+    animation-timing-function: linear;
+}
+@keyframes loading_move {
+    from {stroke-dashoffset: 0;}
+    to {stroke-dashoffset: 50;}
+}
+.timeline-nav svg.loading polygon {
+    fill: none;
+    stroke: #808080;
+}
+
+.timeline-nav svg.active path {
+    stroke: rgb(0, 204, 255);
+}
+.timeline-nav svg.active polygon {
+    fill: rgb(0, 204, 255);
+}
 
 
 .filter nav {
