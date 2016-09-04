@@ -27,18 +27,21 @@ def db_connect_stop(dbconn):
 
 
 class Connection:
-    def __init__(self, host, username=None, passwd=None):
+    def __init__(self, host, username=None, passwd=None, pkey_path=None):
         self.host = host
         self.username = username
         self.passwd = passwd
+        self.pkey = None
+        if pkey_path:
+            self.pkey = paramiko.RSAKey.from_private_key_file(pkey_path)
 
     def open_ssh_connexion(self):
         self.connection = paramiko.SSHClient()
         self.connection.load_system_host_keys()
         self.connection.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-        self.connection.connect(self.host, port=22, username=self.username, password=self.passwd, timeout=10)
+        self.connection.connect(self.host, port=22, username=self.username, password=self.passwd, pkey=self.pkey, timeout=10)
         self.connect_trans = paramiko.Transport((self.host, 22))
-        self.connect_trans.connect(username=self.username, password=self.passwd)
+        self.connect_trans.connect(username=self.username, password=self.passwd, pkey=self.pkey)
         self.transport = paramiko.SFTPClient.from_transport(self.connect_trans)
         log.debug("SSH connection established with %s" % self.host)
 

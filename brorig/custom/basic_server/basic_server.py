@@ -9,6 +9,7 @@ import brorig.connectivity as connectivity
 import brorig.pcap_sniffer as pcap_sniffer
 import brorig.log as log
 
+
 class Server(server.ServerIP):
     def __init__(self, key, name, cluster, group):
         server.ServerIP.__init__(self, key, name, cluster)
@@ -17,9 +18,12 @@ class Server(server.ServerIP):
             pcap_sniffer.PcapRemoteSniffer(server=self, protocols=['HTTP'], ports=[80])
         ]
 
-    def set_ssh_info(self, hostname, user, passwd):
+    def set_ssh_info(self, hostname, user, passwd=None, pkey_path=None):
         self.hostname = hostname
-        self.ssh_connection = connectivity.Connection(self.hostname, user, passwd)
+        self.ssh_connection = connectivity.Connection(self.hostname,
+                                                      username=user,
+                                                      passwd=passwd,
+                                                      pkey_path=pkey_path)
 
     def connectivity(self, full=False):
         # remove loopback connectivity
@@ -81,7 +85,8 @@ class Farm(server.Farm):
                 "type": basic|vagrant
                 "ssh": {
                     "user": <login_user>,
-                    "passwd": <user_password>
+                    "passwd": <user_password> (optional)
+                    "pkey": <ssh_private_key> (optional)
                 }
               },
               ...
@@ -102,7 +107,9 @@ class Farm(server.Farm):
             else:
                 serverClass = self.type_of_server_available[s["type"]]
             s_obj = serverClass(s["key"], s["name"], [c for c in self.clusters if c.name == s["cluster"]][0], s["group"])
-            s_obj.set_ssh_info(s["hostname"], s["ssh"]["user"], s["ssh"]["passwd"])
+            s_obj.set_ssh_info(s["hostname"], s["ssh"]["user"],
+                               passwd=s["ssh"]["passwd"] if 'passwd' in s['ssh'] else None,
+                               pkey_path=s['ssh']['pkey'] if 'pkey' in s['ssh'] else None)
             self.servers.append(s_obj)
         for s in self.servers:
             s.cluster.add_server(s)
