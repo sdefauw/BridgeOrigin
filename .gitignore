@@ -12,6 +12,7 @@ generator/data/
 brorig/data/
 brorig/www/libs/
 config/
+deb-build/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
