@@ -13,7 +13,7 @@
 
             if (graph.nodes.length == 0) return;
 
-            console.debug("Rebuild network graph: %d nodes and %d links", graph.nodes.length, graph.links.length);
+            console.debug("Build network graph: %d nodes and %d links", graph.nodes.length, graph.links.length);
 
             var width = scope.width;
             var height = scope.height;
@@ -43,6 +43,22 @@
                 .linkDistance(200)
                 .alpha(0.1)
                 .start();
+
+            graph.links.forEach(function (item) {
+                function set_monitoring_flag(connectivity, target_connect, traffic) {
+                    for (var i in connectivity) {
+                        var c =  connectivity[i].conn;
+                        for (var j in target_connect) {
+                            var tc = target_connect[j];
+                            if(!tc["monitored"]) tc["monitored"] = null;
+                            if(tc.conn == c) tc["monitored"] = tc["monitored"] ? "in-out" : traffic;
+                        }
+                    }
+                };
+                // Add a monitoring flag
+                set_monitoring_flag(item.source.connectivity.own, item.target.connectivity.remote, "in");
+                set_monitoring_flag(item.target.connectivity.own, item.source.connectivity.remote, "out");
+            });
 
             var path = svg.append("g").selectAll("path")
                 .data(graph.links)

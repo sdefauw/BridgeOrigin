@@ -260,6 +260,21 @@ svg.timeline {
     max-height: 500px;
     overflow-y: auto;
 }
+#displayinfo .traffic {
+    text-align: right;
+}
+#displayinfo .traffic svg.in-out g.in line,
+#displayinfo .traffic svg.in-out g.out line,
+#displayinfo .traffic svg.in g.in line,
+#displayinfo .traffic svg.out g.out line{
+    stroke:rgba(0, 204, 255, .5);
+}
+#displayinfo .traffic svg.in-out g.in polygon,
+#displayinfo .traffic svg.in-out g.out polygon,
+#displayinfo .traffic svg.in g.in polygon,
+#displayinfo .traffic svg.out g.out polygon{
+    fill:rgba(0, 204, 255, .5);
+}
 
 .selectbox {
     display: block;
