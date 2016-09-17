@@ -64,6 +64,27 @@ class ServerIP(Server):
         return self.own_connectivity if full else [c["conn"] for c in self.own_connectivity]
 
 
+class VirtualServer(Server):
+    def __init__(self, my_connectivity):
+        Server.__init__(self, str(my_connectivity), str(my_connectivity), virtual_cluster)
+        virtual_cluster.add_server(self)
+        self.group = "Virtual"
+        self.remote_connect = []
+        self.own_connectivity = [my_connectivity]
+
+    def add_connectivity(self, remote_connection):
+        self.remote_connect.append(remote_connection)
+
+    def connectivity(self, full=False):
+        return self.own_connectivity if not full else [{"name": "", "conn": c} for c in self.own_connectivity]
+
+    def has_connectivity(self):
+        return self.own_connectivity != []
+
+    def remote_connectivity(self):
+        return [{"name": "", "conn": c} for c in self.remote_connect]
+
+
 class Cluster:
     id_gen = 0
 
@@ -109,3 +130,4 @@ class Farm:
 
 
 farm = Farm()
+virtual_cluster = Cluster("Virtual")

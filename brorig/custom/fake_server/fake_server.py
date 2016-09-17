@@ -31,7 +31,10 @@ class Farm(server.Farm):
 
     def list(self):
         if not self.server:
-            self.server = [Server(str(i), "Server" + str(i), server.Cluster(str(i % 3))) for i in range(1, 20)]
+            self.server = [Server(str(i), "Server" + str(i), server.Cluster(str(i % 3))) for i in range(1, 5)]
+            vs = server.VirtualServer("0")
+            vs.add_connectivity("1")
+            self.server.append(vs)
         return self.server
 
     def cluster_list(self):
