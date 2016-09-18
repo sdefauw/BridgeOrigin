@@ -17,6 +17,17 @@
                     nodes: [],
                     links: []
                 },
+                config: {
+                    connectivity: function (node_key, remote_conn, status) {
+                        cs.network.config.connectivity([
+                            {
+                                node: node_key,
+                                remote_conn: remote_conn,
+                                status: status
+                            }
+                        ]);
+                    }
+                },
                 update: function (server_list) {
                     // Clean graph
                     gm.network.graph = {};

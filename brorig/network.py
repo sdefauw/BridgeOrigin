@@ -46,7 +46,7 @@ class Network:
         self.nodes = []
         self.links = []
 
-    def gen(self, list_server):
+    def add_node(self, list_server):
         # Nodes data
         for server in list_server:
             v = Vertex(server)
@@ -54,15 +54,19 @@ class Network:
             self.nodes.append(v)
         # Link data
         # TODO remove duplicated links
+        self.links = []
         for node in self.nodes:
-            remote_connection_list = node.server.remote_connectivity()
-            for remote_connection in remote_connection_list:
-                remote_node = self.get_node(remote_connection["conn"])
-                if not remote_node:
-                    continue
-                e = Edge(remote_connection["name"], node, remote_node)
-                self.links.append(e)
-                node.remote_vertex.append((remote_node, e))
+            self.set_connectivity(node)
+
+    def set_connectivity(self, node):
+        remote_connection_list = node.server.remote_connectivity()
+        for remote_connection in remote_connection_list:
+            remote_node = self.get_node(remote_connection["conn"])
+            if not remote_node:
+                continue
+            e = Edge(remote_connection["name"], node, remote_node)
+            self.links.append(e)
+            node.remote_vertex.append((remote_node, e))
 
     def get_node(self, connectivity_id):
         for node in self.nodes:

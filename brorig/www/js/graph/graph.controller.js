@@ -100,7 +100,12 @@
 
             filter: function () {
                 return ss.protocols;
+            },
+
+            connectMgt: function (node_key, remote_conn, status) {
+                gm.network.config.connectivity(node_key, remote_conn, status);
             }
+
         };
 
         // Define some shortcut
