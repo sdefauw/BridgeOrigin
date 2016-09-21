@@ -89,7 +89,9 @@
                     var handlers = callbackHandler[cmd];
                     var args = data[cmd];
                     for (var i in handlers) {
-                        handlers[i](args);
+                        if(handlers[i]) {
+                            handlers[i](args);
+                        }
                     }
                 }
             }

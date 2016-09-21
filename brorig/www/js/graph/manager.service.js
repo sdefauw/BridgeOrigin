@@ -19,6 +19,10 @@
                 },
                 config: {
                     connectivity: function (node_key, remote_conn, status) {
+                        // Clean graph
+                        gm.network.graph = {};
+                        // TODO timeline
+                        // Ask to update the connectivity
                         cs.network.config.connectivity([
                             {
                                 node: node_key,

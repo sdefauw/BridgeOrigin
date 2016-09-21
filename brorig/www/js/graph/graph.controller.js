@@ -4,10 +4,10 @@
         .controller('GraphController', [
             '$scope', '$window',
             'hotkeys',
-            'GraphManager', 'SettingService', 'PageService',
+            'GraphManager', 'SettingService', 'PageService', 'ChannelService',
             GraphController]);
 
-    function GraphController($scope, $window, hotkeys, gm, ss, page) {
+    function GraphController($scope, $window, hotkeys, gm, ss, page, cs) {
 
         var gc = {
 
@@ -103,6 +103,15 @@
             },
 
             connectMgt: function (node_key, remote_conn, status) {
+                // Loading progress
+                page.load.display();
+                cs.network.callbacks['loading'] = function () {
+                    cs.network.callbacks['loading'] = null;
+                    page.load.hidden();
+                };
+                // Hidden panel info
+                gm.panel.close();
+                // Update connectivity
                 gm.network.config.connectivity(node_key, remote_conn, status);
             }
 

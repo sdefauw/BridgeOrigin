@@ -54,18 +54,22 @@ class Network:
             self.nodes.append(v)
         # Link data
         # TODO remove duplicated links
-        self.links = []
         for node in self.nodes:
             self.set_connectivity(node)
 
     def set_connectivity(self, node):
         remote_connection_list = node.server.remote_connectivity()
+        remote_vertex_known = {v[0]: v[1] for v in node.remote_vertex}
+        node.remote_vertex = []
         for remote_connection in remote_connection_list:
             remote_node = self.get_node(remote_connection["conn"])
             if not remote_node:
                 continue
-            e = Edge(remote_connection["name"], node, remote_node)
-            self.links.append(e)
+            if remote_node in remote_vertex_known:
+                e = remote_vertex_known[remote_node]
+            else:
+                e = Edge(remote_connection["name"], node, remote_node)
+                self.links.append(e)
             node.remote_vertex.append((remote_node, e))
 
     def get_node(self, connectivity_id):
