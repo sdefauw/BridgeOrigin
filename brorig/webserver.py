@@ -419,9 +419,11 @@ class NetworkProcess(threading.Thread):
                 continue
             if status == "enable":
                 # Add new virtual node
-                virtual_nodes = [n for n in net.nodes for c in n.server.own_connectivity if remote_conn in c]
+                virtual_nodes = [n for n in net.nodes for c in n.server.connectivity() if remote_conn in c]
                 if len(virtual_nodes) == 1:
                     virtual_node = virtual_nodes[0]
+                    if not isinstance(virtual_node.server, server.VirtualServer):
+                        continue
                     virtual_node.server.add_connectivity(node_key)
                     net.set_connectivity(node)
                     net.set_connectivity(virtual_node)
