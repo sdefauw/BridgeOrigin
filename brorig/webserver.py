@@ -431,6 +431,21 @@ class NetworkProcess(threading.Thread):
                     vs = server.VirtualServer(remote_conn)
                     vs.add_connectivity(node_key)
                     net.add_node([vs])
+            elif status == "disable":
+                # Remove connectivity to and from the node
+                remote_nodes = [n for n in net.nodes for c in n.server.connectivity() if remote_conn in c]
+                for n in remote_nodes:
+                    if isinstance(n.server, server.VirtualServer):
+                        net.remove_connectivity(node, remote_conn)
+                    if not isinstance(node.server, server.VirtualServer):
+                        for c in node.server.connectivity():
+                            net.remove_connectivity(n, c)
+                # Clean all virtual server
+                v_node = [n for n in net.nodes if isinstance(n.server, server.VirtualServer) if n.remote_vertex == []]
+                for n in v_node:
+                    net.remove_node(n)
+            else:
+                log.error("Invalid connectivity status")
 
     def run(self):
         for r in self.request:
