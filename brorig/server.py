@@ -73,7 +73,7 @@ class VirtualServer(Server):
         self.own_connectivity = [my_connectivity]
 
     def add_connectivity(self, remote_connection):
-        if remote_connection not in self.own_connectivity:
+        if remote_connection not in self.remote_connect:
             self.remote_connect.append(remote_connection)
 
     def connectivity(self, full=False):
