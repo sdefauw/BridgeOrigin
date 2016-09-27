@@ -65,6 +65,7 @@
                 path: null,
                 height: 0,
                 display: false,
+                state: null,
                 graph: {
                     lanes: [],
                     packets: []
@@ -107,6 +108,7 @@
                 data.length-(num_packet-old_data.length), num_packet-old_data.length,
                 old_data.length, data.length, gm.timeline.graph.packets.length);
             gm.packet.loading = false;
+            gm.timeline.state = "updated";
         });
 
         return gm;

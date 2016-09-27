@@ -78,6 +78,16 @@
                 return gm.packet.loading;
             },
 
+            timeline: {
+                needRefresh: function () {
+                    return gm.timeline.state == "need-refresh";
+                },
+                refresh: function () {
+                    gc.refresh_action(false);
+                    gm.timeline.state = "refreshing";
+                }
+            },
+
             refresh_action: function(dbclick) {
                 if (dbclick) {
                     gc.setRealTime();
@@ -103,6 +113,8 @@
             },
 
             connectMgt: function (node_key, remote_conn, status) {
+                gm.timeline.display = false;
+                gm.timeline.state = "need-refresh";
                 // Loading progress
                 page.load.display();
                 cs.network.callbacks['loading'] = function () {

@@ -35,6 +35,7 @@
                 cs.network.callbacks["update_timeline"] = function () {
                     cs.network.callbacks["update_timeline"] = null;
                     gm.packet.request(true);
+                    gm.timeline.state = "refreshing";
                 };
                 // Loading progress
                 page.load.display();

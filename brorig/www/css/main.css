@@ -492,6 +492,37 @@ svg.timeline {
     fill: rgb(0, 204, 255);
 }
 
+.timeline-refresh {
+    display: block;
+    margin: 0 auto;
+    text-align: center;
+    position: absolute;
+    width: 100%;
+    background: rgba(255, 255, 255, .25);
+    backdrop-filter: blur(1px);
+    padding: 18px 0;
+    z-index: 2;
+}
+
+.timeline-refresh svg{
+    margin-left: 10px;
+}
+
+.timeline-refresh:hover {
+    cursor: pointer;
+}
+
+.timeline-refresh:hover span {
+    color: rgb(0, 204, 255);
+}
+
+.timeline-refresh:hover svg path {
+    stroke: rgb(0, 204, 255);
+}
+
+.timeline-refresh:hover svg polygon {
+    fill: rgb(0, 204, 255);
+}
 
 .filter nav {
     display: flex;
