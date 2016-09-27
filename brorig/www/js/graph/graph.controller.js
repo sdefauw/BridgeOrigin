@@ -4,10 +4,10 @@
         .controller('GraphController', [
             '$scope', '$window',
             'hotkeys',
-            'GraphManager', 'SettingService', 'PageService',
+            'GraphManager', 'SettingService', 'PageService', 'ChannelService',
             GraphController]);
 
-    function GraphController($scope, $window, hotkeys, gm, ss, page) {
+    function GraphController($scope, $window, hotkeys, gm, ss, page, cs) {
 
         var gc = {
 
@@ -78,6 +78,16 @@
                 return gm.packet.loading;
             },
 
+            timeline: {
+                needRefresh: function () {
+                    return gm.timeline.state == "need-refresh";
+                },
+                refresh: function () {
+                    gc.refresh_action(false);
+                    gm.timeline.state = "refreshing";
+                }
+            },
+
             refresh_action: function(dbclick) {
                 if (dbclick) {
                     gc.setRealTime();
@@ -100,7 +110,23 @@
 
             filter: function () {
                 return ss.protocols;
+            },
+
+            connectMgt: function (node_key, remote_conn, status) {
+                gm.timeline.display = false;
+                gm.timeline.state = "need-refresh";
+                // Loading progress
+                page.load.display();
+                cs.network.callbacks['loading'] = function () {
+                    cs.network.callbacks['loading'] = null;
+                    page.load.hidden();
+                };
+                // Hidden panel info
+                gm.panel.close();
+                // Update connectivity
+                gm.network.config.connectivity(node_key, remote_conn, status);
             }
+
         };
 
         // Define some shortcut

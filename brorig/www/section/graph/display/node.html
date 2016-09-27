@@ -26,10 +26,34 @@
         </tr>
         <tr>
             <td colspan='2'>Remote connection
-                <table style='padding-left: 10px'>
+                <table style='padding-left: 10px; width:100%;'>
                     <tr ng-repeat="c in gc.node().connectivity.remote ">
                         <td>{{!c.name}}</td>
                         <td class='data'>{{!c.conn}}</td>
+                        <td class="traffic">
+                            <svg version="1.1"
+                                 xmlns="http://www.w3.org/2000/svg"
+                                 x="0px" y="0px" width="13.6px" height="11px" viewBox="0 0 13.6 11" enable-background="new 0 0 13.6 11" xml:space="preserve"
+                                ng-class="c.monitored", ng-click="gc.connectMgt(gc.node().serverkey, c.conn, c.monitored == 'in-out' ? 'disable' : 'enable')">
+                                <g>
+                                    <rect x="0" y="0" width="13" height="11" fill="rgba(0,0,0,0)"></rect>
+                                    <g class="in">
+                                        <line fill="none" stroke="#d7d7d7" stroke-miterlimit="10" x1="2.3" y1="2.5" x2="9.3" y2="2.5"/>
+                                        <g>
+                                            <polygon fill="#d7d7d7" points="9.3,5 13.6,2.5 9.3,0"/>
+                                        </g>
+                                    </g>
+                                    <g class="out">
+                                        <line fill="none" stroke="#d7d7d7" stroke-miterlimit="10" x1="11.3" y1="8.5" x2="4.3" y2="8.5"/>
+                                        <g>
+                                            <polygon fill="#d7d7d7" points="4.3,6 0,8.5 4.3,11"/>
+                                        </g>
+                                    </g>
+                                    <title>{{!c.monitored ? "Monitored "+c.monitored : "No monitoring"}}</title>
+                                </g>
+
+                            </svg>
+                        </td>
                     </tr>
                 </table>
             </td>

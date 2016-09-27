@@ -28,6 +28,7 @@ import brorig.config as config
 import brorig.custom as custom
 import brorig.log as log
 import brorig.network as network
+import brorig.server as server
 import brorig.timeline as timeline
 import brorig.sniffer as sniffer
 
@@ -246,9 +247,8 @@ class WebSocketNetworkHandler(tornado.websocket.WebSocketHandler):
         clientsList.remove(self.client)
         log.debug("WebSocket closed for client %s" % self.client)
 
-    def network_build(self, server_keys):
-        self.client.clean()
-        n = NetworkProcess([str(s) for s in server_keys], self)
+    def network_build(self, request):
+        n = NetworkProcess(request, self)
         n.start()
 
     def timeline_build(self, config):
@@ -353,10 +353,15 @@ class TimelinePacketProcessHelper(threading.Thread):
         
 
 class NetworkProcess(threading.Thread):
-    def __init__(self, server_list, ws):
+    def __init__(self, request, ws):
         threading.Thread.__init__(self)
-        self.servers = [s for s in custom.server.farm.list() if str(s.key) in server_list]
+        self.request = request
         self.ws = ws
+        self.cmd = {
+            "add_nodes": self.add_nodes,
+            "clean": self.clean_graph,
+            "connect_mgt": self.connectivity
+        }
 
     def gen_node(self, node, pos):
         node.index = pos
@@ -387,15 +392,70 @@ class NetworkProcess(threading.Thread):
     def write_ws(self, data):
         self.ws.write_message(json.dumps(data))
 
-    def run(self):
-        net = network.Network()
-        net.gen(self.servers)
+    def send_graph(self, net):
         self.write_ws({
             "network": {
                 "nodes": [self.gen_node(n, i) for i, n in enumerate(net.nodes)],
                 "links": [self.gen_link(l) for l in net.links if l.src and l.dst]
             }})
-        self.ws.client.network = net
+
+    def add_nodes(self, data):
+        server_list = [s for s in custom.server.farm.list() if str(s.key) in data]
+        self.ws.client.network.add_node(server_list)
+
+    def clean_graph(self, data):
+        if data:
+            self.ws.client.network = network.Network()
+
+    def connectivity(self, data):
+        net = self.ws.client.network
+        for c in data:
+            node_key = c['node']
+            node = net.get_node(node_key)
+            remote_conn = c['remote_conn']
+            status = c['status']
+            if not node:
+                log.warning("Ask change connectivity of unknown node")
+                continue
+            if status == "enable":
+                # Add new virtual node
+                virtual_nodes = [n for n in net.nodes for c in n.server.connectivity() if remote_conn in c]
+                if len(virtual_nodes) == 1:
+                    virtual_node = virtual_nodes[0]
+                    if not isinstance(virtual_node.server, server.VirtualServer):
+                        continue
+                    virtual_node.server.add_connectivity(node_key)
+                    net.set_connectivity(node)
+                    net.set_connectivity(virtual_node)
+                else:
+                    vs = server.VirtualServer(remote_conn)
+                    vs.add_connectivity(node_key)
+                    net.add_node([vs])
+            elif status == "disable":
+                # Remove connectivity to and from the node
+                remote_nodes = [n for n in net.nodes for c in n.server.connectivity() if remote_conn in c]
+                for n in remote_nodes:
+                    if isinstance(n.server, server.VirtualServer):
+                        net.remove_connectivity(node, remote_conn)
+                    if not isinstance(node.server, server.VirtualServer):
+                        for c in node.server.connectivity():
+                            net.remove_connectivity(n, c)
+                # Clean all virtual server
+                v_node = [n for n in net.nodes if isinstance(n.server, server.VirtualServer) if n.remote_vertex == []]
+                for n in v_node:
+                    net.remove_node(n)
+            else:
+                log.error("Invalid connectivity status")
+
+    def run(self):
+        for r in self.request:
+            action, args = r.iteritems().next()
+            if action in self.cmd:
+                log.debug("Executing network action: %s(%s)" % (action, args))
+                self.cmd[action](args)
+            else:
+                log.error("Network action % s not found" % action)
+        self.send_graph(self.ws.client.network)
 
 
 class Application(tornado.web.Application):

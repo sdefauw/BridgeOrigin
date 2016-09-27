@@ -17,6 +17,21 @@
                     nodes: [],
                     links: []
                 },
+                config: {
+                    connectivity: function (node_key, remote_conn, status) {
+                        // Clean graph
+                        gm.network.graph = {};
+                        // TODO timeline
+                        // Ask to update the connectivity
+                        cs.network.config.connectivity([
+                            {
+                                node: node_key,
+                                remote_conn: remote_conn,
+                                status: status
+                            }
+                        ]);
+                    }
+                },
                 update: function (server_list) {
                     // Clean graph
                     gm.network.graph = {};
@@ -50,6 +65,7 @@
                 path: null,
                 height: 0,
                 display: false,
+                state: null,
                 graph: {
                     lanes: [],
                     packets: []
@@ -92,6 +108,7 @@
                 data.length-(num_packet-old_data.length), num_packet-old_data.length,
                 old_data.length, data.length, gm.timeline.graph.packets.length);
             gm.packet.loading = false;
+            gm.timeline.state = "updated";
         });
 
         return gm;

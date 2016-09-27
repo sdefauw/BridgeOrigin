@@ -40,9 +40,21 @@
             },
             network: {
                 callbacks: [],
+                config: {
+                    connectivity: function (request_list) {
+                        ws.send(JSON.stringify({
+                            network: [
+                                {connect_mgt: request_list}
+                            ]
+                        }));
+                    }
+                },
                 request: function (server_list) {
                     ws.send(JSON.stringify({
-                        network: server_list
+                        network: [
+                            {clean: true},
+                            {add_nodes: server_list}
+                        ]
                     }));
                 }
             },
@@ -77,7 +89,9 @@
                     var handlers = callbackHandler[cmd];
                     var args = data[cmd];
                     for (var i in handlers) {
-                        handlers[i](args);
+                        if(handlers[i]) {
+                            handlers[i](args);
+                        }
                     }
                 }
             }

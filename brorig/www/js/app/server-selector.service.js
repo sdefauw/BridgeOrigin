@@ -32,15 +32,17 @@
                     return false;
                 }
                 // Request packet when the network is loaded
-                cs.network.callbacks.push(function () {
+                cs.network.callbacks["update_timeline"] = function () {
+                    cs.network.callbacks["update_timeline"] = null;
                     gm.packet.request(true);
-                });
+                    gm.timeline.state = "refreshing";
+                };
                 // Loading progress
                 page.load.display();
-                cs.network.callbacks.push(function () {
-                    cs.network.callbacks.pop();
+                cs.network.callbacks['loading'] = function () {
+                    cs.network.callbacks['loading'] = null;
                     page.load.hidden();
-                });
+                };
                 // Ask to load the network graph
                 gm.network.update(server_list);
                 return true;
