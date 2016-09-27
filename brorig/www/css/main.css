@@ -83,6 +83,8 @@ button:focus,
     margin-left: -170px;
     color: #fff;
     padding: 8px 20px;
+    z-index: 99;
+    backdrop-filter: blur(1px);
 }
 
 #alert.error {
