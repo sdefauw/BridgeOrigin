@@ -309,6 +309,16 @@ class TimelinePacketProcessHelper(threading.Thread):
                     "lane": item.uuid
                 } for (item, p) in p_list_to_transfer]
 
+    def __gen_packet_group(self, groups):
+        data = []
+        for g in groups:
+            data.append(dict(
+                tags=g['tags'],
+                packets=[p.uuid for p in g['set']],
+                uuid=g['uuid']
+            ))
+        return data
+
     def packet_trigger(self):
         if self.clean_packet:
             self.ws.client.network.clean()
@@ -316,6 +326,9 @@ class TimelinePacketProcessHelper(threading.Thread):
         self.transfer_old = not self.real_time
         self.ws.write_message(json.dumps({"packets": self.__gen_packet_list(self.ws.client.network.nodes)}))
         self.ws.write_message(json.dumps({"packets": self.__gen_packet_list(self.ws.client.network.links)}))
+        self.ws.write_message(json.dumps({
+            "packets_group": self.__gen_packet_group(self.ws.client.network.stat['packet_group'])
+        }))
 
     def run(self):
         if self.real_time:

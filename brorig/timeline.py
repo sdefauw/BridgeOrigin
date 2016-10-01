@@ -3,8 +3,10 @@
 
 from __future__ import absolute_import, division, print_function
 
+import base64
 import gc
 import threading
+import uuid
 
 import brorig.log as log
 from brorig.sniffer import Packet
@@ -110,7 +112,8 @@ class Timeline:
                 packet_set += tag_set[tag]['set']
             tag_final_set.append(dict(
                 tags=g,
-                set=list(set(packet_set))
+                set=list(set(packet_set)),
+                uuid=base64.b32encode(uuid.uuid4().bytes)[:26]
             ))
         self.net.stat['packet_group'] = tag_final_set
 
