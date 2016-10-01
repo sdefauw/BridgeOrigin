@@ -75,6 +75,45 @@ class Timeline:
                             packet.state = Packet.ST_NEW
                 log.debug("Packet correlation done for sniffer %s on %s" % (sniffer.__class__.__name__, node.server.name))
 
+    def __group_packet(self):
+        """
+        Group packet with seeming tags
+        :return:
+        """
+        packets = [p for node in self.net.nodes for sniffer in node.server.sniffers for p in sniffer.packets]
+        tag_set = {}
+        tag_group = []
+        # Build tag set
+        for p in packets:
+            for tag in p.tags():
+                if tag not in tag_set:
+                    tag_set[tag] = dict(set=[], group=-1)
+                tag_set[tag]['set'].append(p)
+        # Group tag set
+        for p in packets:
+            group_id = -1
+            for tag in p.tags():
+                if tag_set[tag]['group'] < 0:
+                    # Set tag group
+                    if group_id < 0:
+                        # Add to new group
+                        group_id = len(tag_group)
+                        tag_group.append([tag])
+                    else:
+                        tag_group[group_id].append(tag)
+                    tag_set[tag]['group'] = group_id
+        # Group tag set
+        tag_final_set = []
+        for g in tag_group:
+            packet_set = []
+            for tag in g:
+                packet_set += tag_set[tag]['set']
+            tag_final_set.append(dict(
+                tags=g,
+                set=list(set(packet_set))
+            ))
+        self.net.stat['packet_group'] = tag_final_set
+
     def __clean_sniffer(self):
         """
         Empty sniff of captured packets.
@@ -91,6 +130,8 @@ class Timeline:
         :return:
         """
         self.__get_packets()
+        # TODO concurrent execution
         self.__set_to_network_level()
+        self.__group_packet()
         self.__clean_sniffer()
         gc.collect()

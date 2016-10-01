@@ -45,6 +45,7 @@ class Network:
     def __init__(self):
         self.nodes = []
         self.links = []
+        self.stat = {}
 
     def add_node(self, list_server):
         # Nodes data
