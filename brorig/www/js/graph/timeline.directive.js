@@ -572,13 +572,23 @@
                     addPackets(value);
                     updatePackets();
                     onrect('mouseover', function (d) {
+                        // Display panel
                         $scope.$apply(function () {
                             $scope.selectedData({data: d});
                         });
+                        // Show only packet in the group
+                        itemRects.selectAll("rect").style("opacity", function(p){
+                            return p.group == d.group ? 1 : .2;
+                        });
                     });
                     onrect('mouseout', function (d) {
+                        // Hidden panel
                         $scope.$apply(function () {
                             $scope.selectedData({data: null});
+                        });
+                        // Show all packet
+                        itemRects.selectAll("rect").style("opacity", function(p){
+                            return 1;
                         });
                     });
                     onrect('click', function (d) {
