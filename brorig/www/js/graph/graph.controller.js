@@ -60,7 +60,7 @@
                 page.load.display();
                 // Clean old packets
                 if (clean) {
-                    gm.timeline.graph.packets = [];
+                    gm.timeline.graph.clean();
                     gm.data.path = null;
                 }
                 // Get new packets

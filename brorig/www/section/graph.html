@@ -41,7 +41,7 @@
 
     <div timeline-graph display="gc.display('timeline')" width="gc.getWidth()" height="gc.getHeight('timeline')" height-lane="20"
          selected-time="" selected-data="gc.displayDataPacket(data)" filter="gc.filter()"
-         data="gc.get_data('timeline').packets"></div>
+         data="gc.get_data('timeline').packets.set" groups="gc.get_data('timeline').packets.groups"></div>
 
 
     <section id="displayinfo" ng-controller="DisplayInfoController as dic" ng-show="dic.show()">

@@ -7,6 +7,7 @@
 
         var lanes = [];
         var items = [];
+        var groups = [];
         var domain;
         var lanesMapping = {};
         var lanesTreeStruct = {};
@@ -186,6 +187,25 @@
             items = list;
         };
 
+        /**
+         * Add packet group to the item (packet) structure and store all groups.
+         * Replace UUID by a reference to packet object
+         * @param list array of all groups
+         */
+        var addGroups = function (list) {
+            var packetsByUuid = {};
+            items.forEach(function (p) {
+                packetsByUuid[p.uuid] = p;
+            });
+            list.forEach(function (group) {
+                for (var i in group.packets) {
+                    var packetUuid = group.packets[i];
+                    group.packets[i] = packetsByUuid[packetUuid];
+                    packetsByUuid[packetUuid].group = group;
+                }
+                groups.push(group);
+            });
+        };
 
         var init = function (scope, elem) {
 
@@ -526,6 +546,7 @@
             scope: {
                 display: '=',
                 data: '=',
+                groups: '=',
                 width: '=',
                 height: '=',
                 heightLane: '=',
@@ -566,6 +587,11 @@
                             $scope.selectedData({data: d});
                         });
                     });
+                });
+
+                $scope.$watch('groups', function (value) {
+                   if (!$scope.display) return;
+                   addGroups(value);
                 });
 
                 $scope.$watch('filter', function () {

@@ -324,11 +324,21 @@ class TimelinePacketProcessHelper(threading.Thread):
             self.ws.client.network.clean()
         timeline.Timeline(self.ws.client.network, self.ws.client.directory, self.filter).collect()
         self.transfer_old = not self.real_time
-        self.ws.write_message(json.dumps({"packets": self.__gen_packet_list(self.ws.client.network.nodes)}))
-        self.ws.write_message(json.dumps({"packets": self.__gen_packet_list(self.ws.client.network.links)}))
-        self.ws.write_message(json.dumps({
-            "packets_group": self.__gen_packet_group(self.ws.client.network.stat['packet_group'])
-        }))
+        self.ws.write_message(json.dumps(dict(
+            packets=dict(
+                set=self.__gen_packet_list(self.ws.client.network.nodes)
+            )
+        )))
+        self.ws.write_message(json.dumps(dict(
+            packets=dict(
+                set=self.__gen_packet_list(self.ws.client.network.links)
+            )
+        )))
+        self.ws.write_message(json.dumps(dict(
+            packets=dict(
+                groups=self.__gen_packet_group(self.ws.client.network.stat['packet_group'])
+            )
+        )))
 
     def run(self):
         if self.real_time:
