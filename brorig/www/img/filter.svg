@@ -2,6 +2,17 @@
 <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
 <svg version="1.1"
 	 xmlns="http://www.w3.org/2000/svg"
-	 x="0px" y="0px" width="31.4px" height="32px" viewBox="0 0 31.4 32" enable-background="new 0 0 31.4 32" xml:space="preserve">
-<polygon fill="none" stroke="#808080" stroke-miterlimit="10" points="18.4,12.7 18,23.8 12.7,30.5 12.9,12.7 1.2,0.5 30.2,0.5 "/>
+	 x="0px" y="0px" width="16px" height="16px" viewBox="0 0 16 16" enable-background="new 0 0 16 16" xml:space="preserve">
+	<g>
+		<line fill="none" stroke="#808080" x1="0" y1="2" x2="16" y2="2"/>
+		<circle fill="#808080" cx="2.5" cy="2" r="2"/>
+	</g>
+	<g>
+		<line fill="none" stroke="#808080" x1="0" y1="8" x2="16" y2="8"/>
+		<circle fill="#808080" cx="13.5" cy="8" r="2"/>
+	</g>
+	<g>
+		<line fill="none" stroke="#808080" x1="0" y1="14" x2="16" y2="14"/>
+		<circle fill="#808080" cx="6.5" cy="14" r="2"/>
+	</g>
 </svg>
