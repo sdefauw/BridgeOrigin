@@ -82,7 +82,9 @@ class Timeline:
         Group packet with seeming tags
         :return:
         """
-        packets = [p for node in self.net.nodes for sniffer in node.server.sniffers for p in sniffer.packets]
+        log.debug("Computing packet group...")
+        packets = [p for n in self.net.nodes for p in n.packet_list()] + \
+                  [p for l in self.net.links for p in l.packet_list()]
         tag_set = {}
         tag_group = []
         # Build tag set
@@ -115,6 +117,7 @@ class Timeline:
                 set=list(set(packet_set)),
                 uuid=base64.b32encode(uuid.uuid4().bytes)[:26]
             ))
+        log.debug("Saving packet group computation")
         self.net.stat['packet_group'] = tag_final_set
 
     def __clean_sniffer(self):

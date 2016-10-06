@@ -188,11 +188,12 @@
         };
 
         /**
-         * Add packet group to the item (packet) structure and store all groups.
+         * Set packet group to the item (packet) structure and store all groups.
          * Replace UUID by a reference to packet object
          * @param list array of all groups
          */
-        var addGroups = function (list) {
+        var setGroups = function (list) {
+            groups = [];
             var packetsByUuid = {};
             items.forEach(function (p) {
                 packetsByUuid[p.uuid] = p;
@@ -578,7 +579,7 @@
                         });
                         // Show only packet in the group
                         itemRects.selectAll("rect").style("opacity", function(p){
-                            return p.group == d.group ? 1 : .2;
+                            return p.group == d.group ? 1 : .1;
                         });
                     });
                     onrect('mouseout', function (d) {
@@ -601,7 +602,7 @@
 
                 $scope.$watch('groups', function (value) {
                    if (!$scope.display) return;
-                   addGroups(value);
+                   setGroups(value);
                 });
 
                 $scope.$watch('filter', function () {
