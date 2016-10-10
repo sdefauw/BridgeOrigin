@@ -71,3 +71,10 @@ class Packet:
 
     def template(self):
         return None, None
+
+    def tags(self):
+        """
+        Give a list of tags to correlate packets. A tag is a unique ID shared between packets
+        :return: list of tags
+        """
+        return []

@@ -3,8 +3,10 @@
 
 from __future__ import absolute_import, division, print_function
 
+import base64
 import gc
 import threading
+import uuid
 
 import brorig.log as log
 from brorig.sniffer import Packet
@@ -74,6 +76,49 @@ class Timeline:
                             l.set_packets(packet)
                             packet.state = Packet.ST_NEW
                 log.debug("Packet correlation done for sniffer %s on %s" % (sniffer.__class__.__name__, node.server.name))
+
+    def group_packet(self):
+        """
+        Group packet with seeming tags
+        :return:
+        """
+        log.debug("Computing packet group...")
+        packets = [p for n in self.net.nodes for p in n.packet_list()] + \
+                  [p for l in self.net.links for p in l.packet_list()]
+        tag_set = {}
+        tag_group = []
+        # Build tag set
+        for p in packets:
+            for tag in p.tags():
+                if tag not in tag_set:
+                    tag_set[tag] = dict(set=[], group=-1)
+                tag_set[tag]['set'].append(p)
+        # Group tag set
+        for p in packets:
+            group_id = -1
+            for tag in p.tags():
+                if tag_set[tag]['group'] < 0:
+                    # Set tag group
+                    if group_id < 0:
+                        # Add to new group
+                        group_id = len(tag_group)
+                        tag_group.append([tag])
+                    else:
+                        tag_group[group_id].append(tag)
+                    tag_set[tag]['group'] = group_id
+        # Group tag set
+        tag_final_set = []
+        for g in tag_group:
+            packet_set = []
+            for tag in g:
+                packet_set += tag_set[tag]['set']
+            tag_final_set.append(dict(
+                tags=g,
+                set=list(set(packet_set)),
+                uuid=base64.b32encode(uuid.uuid4().bytes)[:26]
+            ))
+        log.debug("Saving packet group computation")
+        self.net.stat['packet_group'] = tag_final_set
 
     def __clean_sniffer(self):
         """

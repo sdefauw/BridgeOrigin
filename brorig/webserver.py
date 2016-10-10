@@ -13,6 +13,7 @@ import time
 import calendar
 import uuid
 import datetime
+import multiprocessing
 
 import tornado.escape
 import tornado.gen
@@ -309,13 +310,41 @@ class TimelinePacketProcessHelper(threading.Thread):
                     "lane": item.uuid
                 } for (item, p) in p_list_to_transfer]
 
+    def __gen_packet_group(self, groups):
+        data = []
+        for g in groups:
+            data.append(dict(
+                tags=g['tags'],
+                packets=[p.uuid for p in g['set']],
+                uuid=g['uuid']
+            ))
+        return data
+
+    def __gen_stat(self):
+        timeline.Timeline(self.ws.client.network, self.ws.client.directory, self.filter).group_packet()
+        self.ws.write_message(json.dumps(dict(
+            packets=dict(
+                groups=self.__gen_packet_group(self.ws.client.network.stat['packet_group'])
+            )
+        )))
+
     def packet_trigger(self):
         if self.clean_packet:
             self.ws.client.network.clean()
         timeline.Timeline(self.ws.client.network, self.ws.client.directory, self.filter).collect()
         self.transfer_old = not self.real_time
-        self.ws.write_message(json.dumps({"packets": self.__gen_packet_list(self.ws.client.network.nodes)}))
-        self.ws.write_message(json.dumps({"packets": self.__gen_packet_list(self.ws.client.network.links)}))
+        self.ws.write_message(json.dumps(dict(
+            packets=dict(
+                set=self.__gen_packet_list(self.ws.client.network.nodes)
+            )
+        )))
+        self.ws.write_message(json.dumps(dict(
+            packets=dict(
+                set=self.__gen_packet_list(self.ws.client.network.links)
+            )
+        )))
+        p = multiprocessing.Process(target=self.__gen_stat)
+        p.start()
 
     def run(self):
         if self.real_time:

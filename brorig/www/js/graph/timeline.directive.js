@@ -7,6 +7,7 @@
 
         var lanes = [];
         var items = [];
+        var groups = [];
         var domain;
         var lanesMapping = {};
         var lanesTreeStruct = {};
@@ -186,6 +187,26 @@
             items = list;
         };
 
+        /**
+         * Set packet group to the item (packet) structure and store all groups.
+         * Replace UUID by a reference to packet object
+         * @param list array of all groups
+         */
+        var setGroups = function (list) {
+            groups = [];
+            var packetsByUuid = {};
+            items.forEach(function (p) {
+                packetsByUuid[p.uuid] = p;
+            });
+            list.forEach(function (group) {
+                for (var i in group.packets) {
+                    var packetUuid = group.packets[i];
+                    group.packets[i] = packetsByUuid[packetUuid];
+                    packetsByUuid[packetUuid].group = group;
+                }
+                groups.push(group);
+            });
+        };
 
         var init = function (scope, elem) {
 
@@ -526,6 +547,7 @@
             scope: {
                 display: '=',
                 data: '=',
+                groups: '=',
                 width: '=',
                 height: '=',
                 heightLane: '=',
@@ -551,13 +573,23 @@
                     addPackets(value);
                     updatePackets();
                     onrect('mouseover', function (d) {
+                        // Display panel
                         $scope.$apply(function () {
                             $scope.selectedData({data: d});
                         });
+                        // Show only packet in the group
+                        itemRects.selectAll("rect").style("opacity", function(p){
+                            return p.group == d.group ? 1 : .1;
+                        });
                     });
                     onrect('mouseout', function (d) {
+                        // Hidden panel
                         $scope.$apply(function () {
                             $scope.selectedData({data: null});
+                        });
+                        // Show all packet
+                        itemRects.selectAll("rect").style("opacity", function(p){
+                            return 1;
                         });
                     });
                     onrect('click', function (d) {
@@ -566,6 +598,11 @@
                             $scope.selectedData({data: d});
                         });
                     });
+                });
+
+                $scope.$watch('groups', function (value) {
+                   if (!$scope.display) return;
+                   setGroups(value);
                 });
 
                 $scope.$watch('filter', function () {

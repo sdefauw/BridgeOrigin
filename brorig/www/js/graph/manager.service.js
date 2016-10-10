@@ -35,10 +35,7 @@
                 update: function (server_list) {
                     // Clean graph
                     gm.network.graph = {};
-                    gm.timeline.graph = {
-                        lanes: [],
-                        packets: []
-                    };
+                    gm.timeline.graph.clean(true);
                     // Hidden timeline graph, no relevant anymore
                     gm.timeline.display = false;
                     // Ask network graph
@@ -68,7 +65,18 @@
                 state: null,
                 graph: {
                     lanes: [],
-                    packets: []
+                    packets: {
+                        set: [],
+                        groups: []
+                    },
+                    clean: function (all) {
+                      gm.timeline.graph.packets = {
+                          set: [],
+                          groups: []
+                      };
+                      if (all)
+                        gm.timeline.graph.lanes = [];
+                    }
                 },
                 realTime: false
             },
@@ -94,21 +102,26 @@
         });
 
         cs.packet.callbacks.push(function (data) {
-            // Only add new packets and update already in the timeline
-            var num_packet = gm.timeline.graph.packets.length;
-            var old_data = gm.timeline.graph.packets.filter(function (item) {
-                for (var i in data) {
-                    var packet = data[i];
-                    if (packet.uuid == item.uuid) return false;
-                }
-                return true;
-            });
-            gm.timeline.graph.packets = old_data.concat(data);
-            console.info('Add %d and update %d packets in the timeline graph (old:%d, recv:%d, tot:%d)',
-                data.length-(num_packet-old_data.length), num_packet-old_data.length,
-                old_data.length, data.length, gm.timeline.graph.packets.length);
-            gm.packet.loading = false;
-            gm.timeline.state = "updated";
+            if (data.set) {
+                // Only add new packets and update already in the timeline
+                var num_packet = gm.timeline.graph.packets.set.length;
+                var old_data = gm.timeline.graph.packets.set.filter(function (item) {
+                    for (var i in data.set) {
+                        var packet = data.set[i];
+                        if (packet.uuid == item.uuid) return false;
+                    }
+                    return true;
+                });
+                gm.timeline.graph.packets.set = old_data.concat(data.set);
+                console.info('Add %d and update %d packets in the timeline graph (old:%d, recv:%d, tot:%d)',
+                    data.set.length-(num_packet-old_data.length), num_packet-old_data.length,
+                    old_data.length, data.set.length, gm.timeline.graph.packets.set.length);
+                gm.packet.loading = false;
+                gm.timeline.state = "updated";
+            }
+            if (data.groups) {
+                gm.timeline.graph.packets.groups = data.groups
+            }
         });
 
         return gm;

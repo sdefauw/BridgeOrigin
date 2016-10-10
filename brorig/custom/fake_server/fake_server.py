@@ -83,5 +83,8 @@ class FakePacket(sniffer.Packet):
             "packet": "Fake packet",
         })
 
+    def tags(self):
+        return [self.category]
+
 
 farm = Farm()
