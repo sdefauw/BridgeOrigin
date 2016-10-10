@@ -77,7 +77,7 @@ class Timeline:
                             packet.state = Packet.ST_NEW
                 log.debug("Packet correlation done for sniffer %s on %s" % (sniffer.__class__.__name__, node.server.name))
 
-    def __group_packet(self):
+    def group_packet(self):
         """
         Group packet with seeming tags
         :return:
@@ -136,8 +136,6 @@ class Timeline:
         :return:
         """
         self.__get_packets()
-        # TODO concurrent execution
         self.__set_to_network_level()
-        self.__group_packet()
         self.__clean_sniffer()
         gc.collect()

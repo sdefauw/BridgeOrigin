@@ -13,6 +13,7 @@ import time
 import calendar
 import uuid
 import datetime
+import multiprocessing
 
 import tornado.escape
 import tornado.gen
@@ -319,6 +320,14 @@ class TimelinePacketProcessHelper(threading.Thread):
             ))
         return data
 
+    def __gen_stat(self):
+        timeline.Timeline(self.ws.client.network, self.ws.client.directory, self.filter).group_packet()
+        self.ws.write_message(json.dumps(dict(
+            packets=dict(
+                groups=self.__gen_packet_group(self.ws.client.network.stat['packet_group'])
+            )
+        )))
+
     def packet_trigger(self):
         if self.clean_packet:
             self.ws.client.network.clean()
@@ -334,11 +343,8 @@ class TimelinePacketProcessHelper(threading.Thread):
                 set=self.__gen_packet_list(self.ws.client.network.links)
             )
         )))
-        self.ws.write_message(json.dumps(dict(
-            packets=dict(
-                groups=self.__gen_packet_group(self.ws.client.network.stat['packet_group'])
-            )
-        )))
+        p = multiprocessing.Process(target=self.__gen_stat)
+        p.start()
 
     def run(self):
         if self.real_time:
