@@ -311,14 +311,12 @@ class TimelinePacketProcessHelper(threading.Thread):
                 } for (item, p) in p_list_to_transfer]
 
     def __gen_packet_group(self, groups):
-        data = []
-        for g in groups:
-            data.append(dict(
-                tags=g['tags'],
-                packets=[p.uuid for p in g['set']],
-                uuid=g['uuid']
-            ))
-        return data
+        return [
+            dict(tags=g['tags'],
+                 packets=[p.uuid for p in g['set']],
+                 uuid=g['uuid'])
+            for _, g in groups.iteritems()
+        ]
 
     def __gen_stat(self):
         timeline.Timeline(self.ws.client.network, self.ws.client.directory, self.filter).group_packet()

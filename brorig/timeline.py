@@ -80,45 +80,71 @@ class Timeline:
     def group_packet(self):
         """
         Group packet with seeming tags
+        Algorithm: 
+         - Create a bipartite graph where one side is packets set and the other hand the tags set. Each link is the 
+         relation between the packet and the tag. 
+         - Compute Depth First Search to find all packets group. Indeed each connected component is a flow.
         :return:
         """
         log.debug("Computing packet group...")
         packets = [p for n in self.net.nodes for p in n.packet_list()] + \
                   [p for l in self.net.links for p in l.packet_list()]
-        tag_set = {}
-        tag_group = []
-        # Build tag set
+        # Compute network graph
+        n_packet = []
+        n_packet_value = dict()
+        n_tag = []
+        n_tag_value = dict()
+        l = []
         for p in packets:
+            pn = dict(group=-1, value=p, links=[])
             for tag in p.tags():
-                if tag not in tag_set:
-                    tag_set[tag] = dict(set=[], group=-1)
-                tag_set[tag]['set'].append(p)
-        # Group tag set
-        for p in packets:
-            group_id = -1
-            for tag in p.tags():
-                if tag_set[tag]['group'] < 0:
-                    # Set tag group
-                    if group_id < 0:
-                        # Add to new group
-                        group_id = len(tag_group)
-                        tag_group.append([tag])
-                    else:
-                        tag_group[group_id].append(tag)
-                    tag_set[tag]['group'] = group_id
-        # Group tag set
-        tag_final_set = []
-        for g in tag_group:
-            packet_set = []
-            for tag in g:
-                packet_set += tag_set[tag]['set']
-            tag_final_set.append(dict(
-                tags=g,
-                set=list(set(packet_set)),
-                uuid=base64.b32encode(uuid.uuid4().bytes)[:26]
-            ))
+                if tag not in n_tag_value:
+                    n_tag_value[tag] = len(n_tag)
+                    l.append((len(n_tag), len(n_packet)))
+                    n_tag.append(dict(group=-1, value=tag, links=[len(l)-1]))
+                else:
+                    l.append((n_tag_value[tag], len(n_packet)))
+                    n_tag[n_tag_value[tag]]['links'].append(len(l)-1)
+                pn['links'].append(len(l)-1)
+            n_packet_value[p] = len(n_packet)
+            n_packet.append(pn)
+
+        def dfs(node_index, is_packet, group_num):
+            node = n_packet[node_index] if is_packet else n_tag[node_index]
+            if node['group'] >= 0:
+                # End of recursion: reach leaf
+                return
+            # Tag the node
+            if is_packet:
+                n_packet[node_index]['group'] = group_num
+            else:
+                n_tag[node_index]['group'] = group_num
+            # Recursion
+            for link in node['links']:
+                dfs(l[link][int(not is_packet)], not is_packet, group_num)
+
+        # Compute Depth First Search to get connected component
+        log.debug("Doing depth first search on tag packet graph...")
+        group_id = 0
+        for idx, node in enumerate(n_packet):
+            if node['group'] < 0:
+                # node without group
+                dfs(idx, True, group_id)
+                n_packet[idx]['group'] = group_id
+                group_id += 1
+
+        # Convert graph to output structure
+        log.debug("Convert tag packet graph into packet group")
+        tag_group = dict()
+        for n in n_packet:
+            if n['group'] not in tag_group:
+                tag_group[n['group']] = dict(tags=[], set=[], uuid=base64.b32encode(uuid.uuid4().bytes)[:26])
+            tag_group[n['group']]['set'].append(n['value'])
+        for n in n_tag:
+            tag_group[n['group']]['tags'].append(n['value'])
+
         log.debug("Saving packet group computation")
-        self.net.stat['packet_group'] = tag_final_set
+        self.net.stat['packet_group'] = tag_group
 
     def __clean_sniffer(self):
         """

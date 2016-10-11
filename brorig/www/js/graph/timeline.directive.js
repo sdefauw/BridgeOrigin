@@ -16,7 +16,7 @@
 
         var margin = {top: 0, right: 0, bottom: 10, left: 0};
 
-        var x, y, xAxis, svg, svgg, itemRects;
+        var x, y, xAxis, svg, svgg, itemRects, packetsByUuid;
         var listener = {rect: {}, loaded: null};
 
         var yMap = function (index) {
@@ -194,7 +194,7 @@
          */
         var setGroups = function (list) {
             groups = [];
-            var packetsByUuid = {};
+            packetsByUuid = {};
             items.forEach(function (p) {
                 packetsByUuid[p.uuid] = p;
             });
@@ -202,7 +202,9 @@
                 for (var i in group.packets) {
                     var packetUuid = group.packets[i];
                     group.packets[i] = packetsByUuid[packetUuid];
-                    packetsByUuid[packetUuid].group = group;
+                    if (packetsByUuid[packetUuid]) {
+                        packetsByUuid[packetUuid].group = group;
+                    }
                 }
                 groups.push(group);
             });
@@ -579,7 +581,7 @@
                         });
                         // Show only packet in the group
                         itemRects.selectAll("rect").style("opacity", function(p){
-                            return p.group == d.group ? 1 : .1;
+                            return packetsByUuid[p.uuid].group == packetsByUuid[d.uuid].group ? 1 : .1;
                         });
                     });
                     onrect('mouseout', function (d) {
