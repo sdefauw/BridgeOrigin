@@ -5,13 +5,22 @@
 
     function DisplayInfoController(gm) {
 
-        this.close = function () {
-            gm.panel.close();
+        var dic = {
+            close: function () {
+                gm.panel.close();
+            },
+            show: function () {
+                return gm.panel.fixed || gm.selected.node != null || gm.selected.packet != null;
+            },
+            fullScreen: function () {
+                gm.panel.fullScreen = !gm.panel.fullScreen;
+            },
+            isFullScreen: function () {
+                return gm.panel.fullScreen;
+            }
         };
 
-        this.show = function () {
-            return gm.panel.fixed || gm.selected.node != null || gm.selected.packet != null;
-        };
-
+        return dic;
     }
+
 })();

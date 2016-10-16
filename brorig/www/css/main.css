@@ -235,6 +235,17 @@ svg.timeline {
     backdrop-filter: blur(4px);
 }
 
+#displayinfo.full_screen {
+    background: rgb(255, 255, 255);
+    box-shadow: none;
+    border: 0;
+    left: 0;
+    bottom: 0;
+    padding: 10px;
+    margin: 0;
+    backdrop-filter: none;
+}
+
 #displayinfo h1 {
     display: block;
     margin: 0;
@@ -258,10 +269,6 @@ svg.timeline {
     letter-spacing: 0;
 }
 
-#displayinfo .detail {
-    max-height: 500px;
-    overflow-y: auto;
-}
 #displayinfo .traffic {
     text-align: right;
 }
