@@ -4,6 +4,7 @@
 from __future__ import absolute_import, division, print_function
 
 import re
+import pytz
 
 import brorig.connectivity as connectivity
 
@@ -49,6 +50,7 @@ class ServerIP(Server):
     def __init__(self, key, name, cluster):
         Server.__init__(self, key, name, cluster)
         self.ip = []
+        self.timezone = None
 
     def __get_ip(self):
         ip_cmd_stdout = connectivity.Script.remote_exe(self.ssh_connection, "ip addr show")
@@ -62,6 +64,12 @@ class ServerIP(Server):
             self.ip = self.__get_ip()
             self.own_connectivity = [{"name": eth, "conn": ip} for eth, ip in self.ip.iteritems()]
         return self.own_connectivity if full else [c["conn"] for c in self.own_connectivity]
+
+    def timeZone(self):
+        if not self.timezone:
+            tz_str = connectivity.Script.remote_exe(self.ssh_connection, "cat /etc/timezone")
+            self.timezone = pytz.timezone(tz_str.rstrip())
+        return self.timezone
 
 
 class VirtualServer(Server):
