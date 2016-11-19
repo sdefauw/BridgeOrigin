@@ -10,7 +10,7 @@ import pkg_resources
 
 import brorig.config as config
 import brorig.log as log
-import brorig.webserver as webserver
+import brorig.web_server as webserver
 import brorig.custom as custom
 
 
