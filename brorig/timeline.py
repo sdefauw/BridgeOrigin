@@ -10,12 +10,14 @@ import uuid
 
 import brorig.log as log
 from brorig.sniffer import Packet
+from brorig.search import SearchManager
 
 
 class Timeline:
     def __init__(self, network, tmp_dir, filter=None):
         self.net = network
         self.filter = filter
+        self.search = SearchManager(self.net)
         self.tmp_dir = tmp_dir
 
     def __get_packets(self):
@@ -164,4 +166,5 @@ class Timeline:
         self.__get_packets()
         self.__set_to_network_level()
         self.__clean_sniffer()
+        self.search.populate_search_engine()
         gc.collect()

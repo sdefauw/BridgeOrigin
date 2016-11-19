@@ -29,7 +29,8 @@ setup(
     install_requires=[
         'tornado>=4.0.0',
         'paramiko>=1.14.0',
-        'pymysql>=0.6.6'
+        'pymysql>=0.6.6',
+        'elasticsearch>=5.0.1'
     ],
 
 

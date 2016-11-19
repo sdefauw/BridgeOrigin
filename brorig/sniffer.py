@@ -3,6 +3,8 @@
 
 import base64
 import uuid
+import calendar
+from pytz.reference import UTC
 
 
 class Sniffer:
@@ -78,3 +80,22 @@ class Packet:
         :return: list of tags
         """
         return []
+
+    def search_criterion(self):
+        """
+        Get all data that will be inserted to the search engine.
+        Default values: protocol, category, time.start, time.end, server.src (server key), server.dst (server key)
+        :return: data collection searchable
+        """
+        return dict(
+            protocol=self.protocol,
+            category=self.category,
+            time=dict(
+                start=calendar.timegm(self.src['time'].timetuple()) if self.src['time'] else 0,
+                end=calendar.timegm(self.dst['time'].timetuple()) if self.dst['time'] else 0
+            ),
+            server=dict(
+                src=self.src['server'].key if self.src['server'] else None,
+                dst=self.dst['server'].key if self.dst['server'] else None
+            )
+        )
