@@ -11,13 +11,20 @@ import brorig.log as log
 class SearchManager:
 
     def __init__(self, index):
-        self.es = Elasticsearch()
         self.index = "brorig_%s" % index.lower()
+        self.es = Elasticsearch()
+        if not self.es.ping():
+            log.warning("Search engine not available")
+            self.es = None
+            return
+        self.es.indices.create(index=self.index)
 
     def packet_population(self, network):
         """
         Transfer all search criterion packet to the search engine.
         """
+        if not self.es:
+            return
         log.debug("Adding packet in search engine...")
         packets = [p for n in network.nodes for p in n.packet_list()] + \
                   [p for l in network.links for p in l.packet_list()]
@@ -29,6 +36,8 @@ class SearchManager:
         """
         Clean the search engine
         """
+        if not self.es:
+            return
         log.debug("Destroy index %s in search engine" % self.index)
         self.es.indices.delete(index=self.index, ignore=[400, 404])
 
