@@ -4,7 +4,6 @@
 import base64
 import uuid
 import calendar
-from pytz.reference import UTC
 
 
 class Sniffer:

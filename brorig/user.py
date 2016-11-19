@@ -11,6 +11,7 @@ import os
 
 import brorig.log as log
 import brorig.config as config
+from brorig.search import SearchManager
 
 
 class UserList:
@@ -36,12 +37,13 @@ class UserList:
     def destroy(self):
         for _, user in self.list.items():
             user.destroy()
-        log.info("Destroy %d users" % (len(self.list)))
+        log.info("Destroy %d reminding users" % (len(self.list)))
 
 
 class User:
     """
     Representation of an user in the browser.
+    The object contains information of the user request like network, packets, search, filetrs,...
     """
 
     def __init__(self):
@@ -50,6 +52,8 @@ class User:
         self.network = None
         self.timeline = None
         self.timeline_filter = {}
+        self.search_engine = None
+        self.clean()
 
     def __allocate_directory(self):
         root_path = config.config['server']['data_path']
@@ -69,6 +73,9 @@ class User:
     def clean(self):
         self.network = None
         self.timeline = None
+        if self.search_engine:
+            self.search_engine.clean()
+        self.search_engine = SearchManager(self.uuid)
         gc.collect()
 
     def __str__(self):

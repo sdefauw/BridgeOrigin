@@ -59,17 +59,20 @@ class TimelinePacketProcessHelper(threading.Thread):
         ]
 
     def __gen_stat(self):
-        PacketProcessor(self.ws.client.network, self.ws.client.directory, self.filter).group_packet()
+        PacketCorrelationProcessor(self.ws.client.network, self.ws.client.directory, self.filter).group_packet()
         self.ws.write_message(json.dumps(dict(
             packets=dict(
                 groups=self.__gen_packet_group(self.ws.client.network.stat['packet_group'])
             )
         )))
 
+    def __gen_search_engine(self):
+        self.ws.client.search_engine.packet_population(self.ws.client.network)
+
     def packet_trigger(self):
         if self.clean_packet:
             self.ws.client.network.clean()
-        PacketProcessor(self.ws.client.network, self.ws.client.directory, self.filter).collect()
+        PacketCorrelationProcessor(self.ws.client.network, self.ws.client.directory, self.filter).collect()
         self.transfer_old = not self.real_time
         self.ws.write_message(json.dumps(dict(
             packets=dict(
@@ -82,6 +85,8 @@ class TimelinePacketProcessHelper(threading.Thread):
             )
         )))
         p = multiprocessing.Process(target=self.__gen_stat)
+        p.start()
+        p = multiprocessing.Process(target=self.__gen_search_engine)
         p.start()
 
     def run(self):
@@ -225,11 +230,10 @@ class NetworkProcess(threading.Thread):
         self.send_graph(self.ws.client.network)
 
 
-class PacketProcessor:
+class PacketCorrelationProcessor:
     def __init__(self, network, tmp_dir, filter=None):
         self.net = network
         self.filter = filter
-        self.search = SearchManager(self.net)
         self.tmp_dir = tmp_dir
 
     def __get_packets(self):
@@ -378,5 +382,4 @@ class PacketProcessor:
         self.__get_packets()
         self.__set_to_network_level()
         self.__clean_sniffer()
-        self.search.populate_search_engine()
         gc.collect()
