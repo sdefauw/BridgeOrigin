@@ -51,6 +51,8 @@
                         return;
                     }
                     gm.packet.loading = true;
+                    // TODO unify time and match
+                    cs.packet.config.filter = ss.search.filter.match;
                     cs.packet.request(interval.from.getTime(), interval.to.getTime(), clean);
                 },
                 realtime: function () {

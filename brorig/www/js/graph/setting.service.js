@@ -28,7 +28,8 @@
                                 'to': ss.search.filter.time.to
                             };
                         }
-                    }
+                    },
+                    match: null
                 }
             }
         };

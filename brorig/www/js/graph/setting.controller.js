@@ -27,6 +27,9 @@
                 to:{
                     date: new Date(),
                     open: false
+                },
+                search: {
+                    match: null
                 }
             },
 
@@ -57,6 +60,10 @@
                 setting.timeSelection = 'from_to';
                 ss.search.filter.time.from = setting.pickers.from.date;
                 ss.search.filter.time.to = setting.pickers.to.date;
+            },
+
+            applySearchFilter: function () {
+                ss.search.filter.match = JSON.parse(setting.pickers.search.match);
             },
 
             filtersAvailable: function () {

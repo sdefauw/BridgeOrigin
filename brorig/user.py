@@ -53,6 +53,7 @@ class User:
         self.timeline = None
         self.timeline_filter = {}
         self.search_engine = None
+        self.search_result = None
         self.clean()
 
     def __allocate_directory(self):
@@ -76,6 +77,7 @@ class User:
         if self.search_engine:
             self.search_engine.clean()
         self.search_engine = SearchManager(self.uuid)
+        self.search_result = None
         gc.collect()
 
     def __str__(self):

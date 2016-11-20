@@ -41,5 +41,24 @@ class SearchManager:
         log.debug("Destroy index %s in search engine" % self.index)
         self.es.indices.delete(index=self.index, ignore=[400, 404])
 
+    def search(self, filter):
+        """
+        Ask to the search engine to gives the most pertinent result based on the user filter
+        :param filter: request user filter
+        :return: list of packet UUID resulted of the search request
+        """
+        serialized_filter = filter.copy()
+        # TODO support time ?
+        del serialized_filter['time']
+        if serialized_filter == {}:
+            return None
+        result = self.es.search(index=self.index, doc_type='packets', body={
+            "query": {
+                "match": serialized_filter
+            }
+        })
+        log.debug("Search engine found %s packets" % result['hits']['total'])
+        return [h['_id'] for h in result['hits']['hits']]
+
     def __del__(self):
         self.clean()

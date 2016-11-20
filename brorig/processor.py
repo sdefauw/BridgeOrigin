@@ -12,6 +12,7 @@ import multiprocessing
 import threading
 import time
 import uuid
+import time
 
 from brorig import config, sniffer, custom, network, server, log
 from brorig.search import SearchManager
@@ -22,6 +23,7 @@ class TimelinePacketProcessHelper(threading.Thread):
     def __init__(self, ws, clean=False, filter={}):
         threading.Thread.__init__(self)
         self.ws = ws
+        self.user = self.ws.client
         self.filter = filter
         self.clean_packet = clean
         self.real_time = False
@@ -32,7 +34,8 @@ class TimelinePacketProcessHelper(threading.Thread):
         def time_format(t):
             return calendar.timegm(t.timetuple()) * 1e3 + t.microsecond / 1e3 if t else None
 
-        p_list_to_transfer = [(item, p) for item in list for p in item.packet_list() if p.src and p.src["time"] ]
+        p_list_to_transfer = [(item, p) for item in list for p in item.packet_list() if p.src and p.src["time"] and
+                              not p.state == sniffer.Packet.ST_IGNORED]
         # Remove packet already transferred
         if not self.transfer_old:
             p_list_to_transfer = [(item, p) for (item, p) in p_list_to_transfer if not p.state == sniffer.Packet.ST_TRANSFERRED]
@@ -59,21 +62,79 @@ class TimelinePacketProcessHelper(threading.Thread):
         ]
 
     def __gen_stat(self):
-        PacketCorrelationProcessor(self.ws.client.network, self.ws.client.directory, self.filter).group_packet()
-        self.ws.write_message(json.dumps(dict(
-            packets=dict(
-                groups=self.__gen_packet_group(self.ws.client.network.stat['packet_group'])
-            )
-        )))
+        PacketCorrelationProcessor(self.user.network, self.user.directory, self.filter).group_packet()
 
     def __gen_search_engine(self):
-        self.ws.client.search_engine.packet_population(self.ws.client.network)
+        network = self.user.network
+        # Populate search engine
+        # TODO don't need to clean anytime
+        self.user.search_engine.clean()
+        self.user.search_engine.packet_population(network)
+        # Waiting the end of request
+        time.sleep(1)
+        # Get request of the search engine
+        packets_uuid = self.user.search_engine.search(self.user.timeline_filter)
+        # Convert uuid to packet object and save result
+        if not packets_uuid:
+            self.user.search_result = None
+            return
+        packets = [p for n in network.nodes for p in n.packet_list()] + \
+                  [p for l in network.links for p in l.packet_list()]
+        self.user.search_result = [p for p in packets if p.uuid in packets_uuid]
 
-    def packet_trigger(self):
+    def __shrink_packet_set(self):
+        search_result = self.user.search_result
+        groups = self.user.network.stat['packet_group']
+        if not search_result or not groups:
+            return
+        # Shrink the group with packets found by the search result
+        shrink_groups = {}
+        for i, g in groups.iteritems():
+            for p in g['set']:
+                if p in search_result:
+                    shrink_groups[i] = g
+                    continue
+        self.user.network.stat['packet_group'] = shrink_groups
+        p_list = [p for _, g in shrink_groups.iteritems() for p in g['set']]
+        for n in self.user.network.nodes:
+            for p in n.packet_list():
+                if p not in p_list:
+                    p.state = sniffer.Packet.ST_IGNORED
+        for l in self.user.network.links:
+            for p in l.packet_list():
+                if p not in p_list:
+                    p.state = sniffer.Packet.ST_IGNORED
+
+    def packet_process(self):
+        """
+        Process packet computation and give it the web interface:
+         - Get packets from sniffers
+         - Correlates packets to the network
+         - Do correlations between packets
+         - Execute search request
+        """
+        # TODO improvement: don't wait the end of packet correlation if the search result is None
         if self.clean_packet:
-            self.ws.client.network.clean()
-        PacketCorrelationProcessor(self.ws.client.network, self.ws.client.directory, self.filter).collect()
+            self.user.network.clean()
+        # Collect packets from sniffer
+        PacketCorrelationProcessor(self.user.network, self.user.directory, self.filter).collect()
         self.transfer_old = not self.real_time
+        # TODO do threading
+        # Do correlations between packets
+        #p_stat = multiprocessing.Process(target=self.__gen_stat)
+        #p_stat.start()
+        self.__gen_stat()
+        # Execute search request
+        #p_search = multiprocessing.Process(target=self.__gen_search_engine)
+        #p_search.start()
+        self.__gen_search_engine()
+        # Waiting the end of all execution
+        #p_stat.join()
+        #p_search.join()
+        # Shrink packet set based on information computed before
+        shrink_net = self.__shrink_packet_set()
+        # Send data to network level
+        log.debug("Sending packet data to Web UI")
         self.ws.write_message(json.dumps(dict(
             packets=dict(
                 set=self.__gen_packet_list(self.ws.client.network.nodes)
@@ -84,10 +145,11 @@ class TimelinePacketProcessHelper(threading.Thread):
                 set=self.__gen_packet_list(self.ws.client.network.links)
             )
         )))
-        p = multiprocessing.Process(target=self.__gen_stat)
-        p.start()
-        p = multiprocessing.Process(target=self.__gen_search_engine)
-        p.start()
+        self.ws.write_message(json.dumps(dict(
+            packets=dict(
+                groups=self.__gen_packet_group(self.user.network.stat['packet_group'])
+            )
+        )))
 
     def run(self):
         if self.real_time:
@@ -102,7 +164,7 @@ class TimelinePacketProcessHelper(threading.Thread):
             while self.real_time:
                 t = datetime.datetime.utcnow()
                 # Collect packets
-                self.packet_trigger()
+                self.packet_process()
                 # Compute next time
                 now = datetime.datetime.utcnow()
                 d = self.refresh_interval - (now - t).seconds
@@ -118,7 +180,7 @@ class TimelinePacketProcessHelper(threading.Thread):
             log.info("End of real-time")
         else:
             # Inform only new packet
-            self.packet_trigger()
+            self.packet_process()
             # Check if we don't need to run again
             if self.real_time:
                 self.run()
@@ -129,6 +191,7 @@ class NetworkProcess(threading.Thread):
         threading.Thread.__init__(self)
         self.request = request
         self.ws = ws
+        self.user = self.ws.client
         self.cmd = {
             "add_nodes": self.add_nodes,
             "clean": self.clean_graph,
@@ -173,14 +236,14 @@ class NetworkProcess(threading.Thread):
 
     def add_nodes(self, data):
         server_list = [s for s in custom.server.farm.list() if str(s.key) in data]
-        self.ws.client.network.add_node(server_list)
+        self.user.network.add_node(server_list)
 
     def clean_graph(self, data):
         if data:
-            self.ws.client.network = network.Network()
+            self.user.network = network.Network()
 
     def connectivity(self, data):
-        net = self.ws.client.network
+        net = self.user.network
         for c in data:
             node_key = c['node']
             node = net.get_node(node_key)
@@ -227,7 +290,7 @@ class NetworkProcess(threading.Thread):
                 self.cmd[action](args)
             else:
                 log.error("Network action %s not found" % action)
-        self.send_graph(self.ws.client.network)
+        self.send_graph(self.user.network)
 
 
 class PacketCorrelationProcessor:

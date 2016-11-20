@@ -54,6 +54,10 @@
                 </span>
             </label>
         </section>
-
+        <h1>Search engine criterion</h1>
+        <section class="search-engine">
+            <textarea name="search-input" id="search-input" placeholder="Search engine free field" ng-model="sc.pickers.search.match"></textarea>
+            <button type="button" ng-click="sc.applySearchFilter()">Apply rules</button>
+        </section>
     </div>
 </div>

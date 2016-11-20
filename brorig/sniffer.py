@@ -43,7 +43,7 @@ class Sniffer:
 
 
 class Packet:
-    ST_INIT, ST_NEW, ST_UPDATED, ST_TRANSFERRED = range(4)
+    ST_INIT, ST_NEW, ST_UPDATED, ST_TRANSFERRED, ST_IGNORED = range(5)
 
     def __init__(self, protocol, category):
         self.category = category

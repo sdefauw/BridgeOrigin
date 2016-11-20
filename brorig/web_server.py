@@ -190,10 +190,8 @@ class WebSocketNetworkHandler(tornado.websocket.WebSocketHandler):
 
     def timeline_build(self, config):
         # Set configuration in the timeline
-        if 'filter' in config:
-            # TODO
-            # use self.client.timeline_filter
-            pass
+        if 'filter' in config and config['filter']:
+            self.client.timeline_filter = config['filter']
         if 'packet' in config:
             self.client.timeline_filter['time'] = {
                 'start': datetime.datetime.utcfromtimestamp(config['packet']['from']/1000),
