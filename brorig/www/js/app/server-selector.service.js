@@ -75,17 +75,16 @@
         };
 
         $http.get('server/list')
-            .success(function (data) {
-                sss.servers = data;
+            .then(function (res) {
+                sss.servers = res.data;
                 // Get info form session cache
                 var list = sss.storage.getServerkeys();
                 for (var i in sss.servers) {
                     var server = sss.servers[i];
                     server.selected = list.indexOf('' + server.key) != -1;
                 }
-            })
-            .error(function (data, status) {
-                al.error("Impossible the list of SERVER: " + status);
+            }, function (res) {
+                al.error("Impossible the list of SERVER: " + res.status);
             });
 
 

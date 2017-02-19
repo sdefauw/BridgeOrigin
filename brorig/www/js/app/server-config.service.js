@@ -25,11 +25,10 @@
                     };
                     cl.configure.status = "...";
                     $http(req)
-                        .success(function (data) {
+                        .then(function (data) {
                             cl.configure.update_status();
                             callback(data);
-                        })
-                        .error(function (data, status) {
+                        }, function (data, status) {
                             al.error("Impossible to configure sniffers");
                         });
                 },
@@ -46,7 +45,8 @@
                                 serverskey: serverkeys.join()
                             }
                         })
-                        .success(function (data) {
+                        .then(function (res) {
+                            var data = res.data;
                             var sniff_off = data.filter(function(item) {
                                 return !item.enable;
                             });
@@ -57,8 +57,7 @@
                             } else {
                                 cl.configure.status = "MIX";
                             }
-                        })
-                        .error(function (data, status) {
+                        }, function (err) {
                             al.error("Impossible to get sniffer configuration status");
                         });
                 }
@@ -76,10 +75,9 @@
                     data: {serverskey: serverkeys}
                 };
                 $http(req)
-                    .success(function (data) {
-                        callback(data);
-                    })
-                    .error(function (data, status) {
+                    .then(function (res) {
+                        callback(res.data);
+                    }, function (err) {
                         al.error("Fail to clean sniffers");
                     });
             }

@@ -38,8 +38,8 @@
                 params: {
                     clientID: cs.client.data.uuid
                 }
-            }).success(function (data) {
-                ss.protocols = data;
+            }).then(function (res) {
+                ss.protocols = res.data;
                 // Set default filters
                 for (var protocol in ss.protocols) {
                     var protocolObj = ss.protocols[protocol];
