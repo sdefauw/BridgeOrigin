@@ -30,6 +30,7 @@ setup(
         'tornado>=4.0.0',
         'paramiko>=1.14.0',
         'pymysql>=0.6.6',
+        'pytz>=2013.7',
         'elasticsearch>=5.0.1'
     ],
 

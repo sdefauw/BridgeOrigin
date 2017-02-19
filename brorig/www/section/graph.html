@@ -44,7 +44,12 @@
          data="gc.get_data('timeline').packets.set" groups="gc.get_data('timeline').packets.groups"></div>
 
 
-    <section id="displayinfo" ng-controller="DisplayInfoController as dic" ng-show="dic.show()">
+    <section id="displayinfo" ng-controller="DisplayInfoController as dic" ng-show="dic.show()"
+        ng-class="dic.isFullScreen() ? 'full_screen' : ''">
+        <img src="{{ static_url('img/full_screen_off.svg') }}" ng-click="dic.fullScreen()" ng-show="dic.isFullScreen()"
+             style="height: 10px; float: left"/>
+        <img src="{{ static_url('img/full_screen.svg') }}" ng-click="dic.fullScreen()" ng-show="!dic.isFullScreen()"
+             style="height: 8px; float: left"/>
         <img src="{{ static_url('img/x.svg') }}" ng-click="dic.close()" ng-show="gc.panel_fixed()" class="close"/>
 
         {% include "graph/display/node.html" %}

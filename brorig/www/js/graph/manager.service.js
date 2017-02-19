@@ -84,10 +84,12 @@
             },
             panel: {
                 fixed: false,
+                fullScreen: false,
                 close: function () {
                     gm.selected.node = null;
                     gm.selected.packet = null;
                     gm.panel.fixed = false;
+                    gm.panel.fullScreen = false;
                 }
             },
             selected: {

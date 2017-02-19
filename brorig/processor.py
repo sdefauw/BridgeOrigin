@@ -6,6 +6,7 @@ from __future__ import absolute_import, division, print_function
 import base64
 import calendar
 import datetime
+from pytz.reference import UTC
 import gc
 import json
 import multiprocessing
@@ -32,7 +33,7 @@ class TimelinePacketProcessHelper(threading.Thread):
 
     def __gen_packet_list(self, list):
         def time_format(t):
-            return calendar.timegm(t.timetuple()) * 1e3 + t.microsecond / 1e3 if t else None
+            return calendar.timegm(t.astimezone(UTC).timetuple()) * 1e3 + t.microsecond / 1e3 if t else None
 
         p_list_to_transfer = [(item, p) for item in list for p in item.packet_list() if p.src and p.src["time"] and
                               not p.state == sniffer.Packet.ST_IGNORED]
