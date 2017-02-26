@@ -29,7 +29,8 @@
                     open: false
                 },
                 search: {
-                    match: null
+                    criterion: {},
+                    match: []
                 }
             },
 
@@ -62,8 +63,21 @@
                 ss.search.filter.time.to = setting.pickers.to.date;
             },
 
-            applySearchFilter: function () {
-                ss.search.filter.match = JSON.parse(setting.pickers.search.match);
+            addSearchCritiron: function () {
+                setting.pickers.search.match.push({
+                    criterion: "",
+                    value: ""
+                });
+            },
+
+            updateSearchMatch: function () {
+                var f = {};
+                for(var i in setting.pickers.search.match) {
+                    var line = setting.pickers.search.match[i];
+                    if (!line.value) continue;
+                    f[line.criterion] = line.value;
+                }
+                ss.search.filter.match = f;
             },
 
             filtersAvailable: function () {

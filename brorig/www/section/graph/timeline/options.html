@@ -55,9 +55,24 @@
             </label>
         </section>
         <h1>Search engine criterion</h1>
-        <section class="search-engine">
-            <textarea name="search-input" id="search-input" placeholder="Search engine free field" ng-model="sc.pickers.search.match"></textarea>
-            <button type="button" ng-click="sc.applySearchFilter()">Apply rules</button>
+        <section id="search-engine">
+            <form ng-repeat="match in sc.pickers.search.match" ng-submit="sc.updateSearchMatch()">
+                <input type="text" ng-model="match.criterion" list="searchCriterion"
+                       name="searchCrit" ng-change="sc.updateSearchMatch()" class="criterion"/>
+                <datalist id="searchCriterion">
+                    <option ng-repeat="(crit, value) in sc.pickers.search.criterion" value="{{!crit}}">{{!crit}}
+                    </option>
+                </datalist>
+                <input ng-model="match.value"
+                       type="text" ng-change="sc.updateSearchMatch()" class="value"
+                       list="searchCriterionValue{{!match.criterion}}"/>
+                <datalist id="searchCriterionValue{{!match.criterion}}">
+                    <option ng-repeat="option in sc.pickers.search.criterion[match.criterion].values" value="{{!option}}">
+                        {{!option}}
+                    </option>
+                </datalist>
+            </form>
+            <button type="button" ng-click="sc.addSearchCritiron()">+</button>
         </section>
     </div>
 </div>

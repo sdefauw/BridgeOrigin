@@ -52,9 +52,12 @@ class SearchManager:
         del serialized_filter['time']
         if serialized_filter == {}:
             return None
+        macthes = {"macth": i for i in serialized_filter}
         result = self.es.search(index=self.index, doc_type='packets', body={
             "query": {
-                "match": serialized_filter
+                "bool": {
+                    "must": macthes
+                }
             }
         })
         log.debug("Search engine found %s packets" % result['hits']['total'])
