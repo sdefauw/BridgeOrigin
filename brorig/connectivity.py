@@ -87,41 +87,54 @@ class Script:
 
     def exe(self):
         # TODO fast remote execution (one line). Don't use remote transfer in tmp script
-        # Open SSH connection
-        self.connection.open_ssh_connexion()
-        # Write file script
-        path_script = '/tmp/script'
+
+        # Define script name
+        path_script = '/tmp/brorig'
+
+        # Create local script file
         if not self.file_name:
             f = open(path_script, 'w')
             f.write(self.code)
             f.close()
-        # Transfer if needed
+
+        # Transfer script to remote server if needed
         if self.exe_remote:
+            self.connection.open_ssh_connexion()
             t = Transfer(self.connection.transport)
             t.put(self.file_name if self.file_name else path_script, path_script)
-        # Execute script
-        starter_script = self.interpret
-        if self.sudo:
-            starter_script = "sudo " + starter_script
-        cmd = starter_script + ' ' + path_script
-        cmd += ((" " + (
-            " ".join([("-" if len(str(arg)) == 1 else "--") + str(arg) + " " + str(val) for arg, val in
-                      self.args.iteritems()]))) if self.args != {} else "")
+
+        # Script execution
+        cmd = '{sudo}{interpret} {script} {args}'.format(
+            sudo=("sudo " if self.sudo else ""),
+            interpret=self.interpret,
+            script=path_script,
+            args=" ".join([("-" if len(str(arg)) == 1 else "--") + str(arg) + " " + str(val) for arg, val in
+                            self.args.iteritems()]))
+
+        log.info("{1} code execution: {0:.100}".format(self.code, "Remote" if self.exe_remote else "Local"))
+        log.debug("Launch {1} command: {0}".format(cmd, "remote" if self.exe_remote else "local"))
+
         if self.exe_remote:
-            log.info("Remote command execution: %s" % cmd)
+            # Remote execution
             _, stdout, stderr = self.connection.connection.exec_command(cmd)
             err = stderr.read()
             out = stdout.read()
-            if err and not self.ignore_error:
-                self.connection.close_ssh_connexion()
-                raise Exception('Remote script execution: ' + err)
+            return_code = self.connection.connection.recv_exit_status()
         else:
-            log.info("Local command execution: %s" % cmd)
+            # Local execution
             p = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
             out, err = p.communicate()
-            if err and not self.ignore_error:
-                self.connection.close_ssh_connexion()
-                raise Exception('Local script execution: ' + err)
+            return_code = p.returncode
+
+        # Close remote connection
+        if self.exe_remote:
+            self.connection.close_ssh_connexion()
+
+        # StdErr 
+        if return_code != 0 and not self.ignore_error:
+            raise Exception('{1} script execution error: {0}'.format(err, "Remote" if self.exe_remote else "Local"))
+
+        # End script execution
         self.connection.close_ssh_connexion()
         return out
 
