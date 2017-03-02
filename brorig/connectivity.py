@@ -3,9 +3,13 @@
 
 from __future__ import absolute_import, division, print_function
 
+import base64
 import subprocess
+
+import os
 import pymysql
 import paramiko
+import uuid
 
 import brorig.log as log
 import brorig.config as config
@@ -89,7 +93,7 @@ class Script:
         # TODO fast remote execution (one line). Don't use remote transfer in tmp script
 
         # Define script name
-        path_script = '/tmp/brorig'
+        path_script = '/tmp/brorig_{0!s}'.format(base64.b32encode(uuid.uuid4().bytes)[:26])
 
         # Create local script file
         if not self.file_name:
@@ -126,11 +130,16 @@ class Script:
             out, err = p.communicate()
             return_code = p.returncode
 
+        # Remove script
+        os.remove(path_script)
+        if self.exe_remote:
+            self.connection.connection.exec_command("rm -rf {}".format(path_script))
+
         # Close remote connection
         if self.exe_remote:
             self.connection.close_ssh_connexion()
 
-        # StdErr 
+        # Error handler
         if return_code != 0 and not self.ignore_error:
             raise Exception('{1} script execution error: {0}'.format(err, "Remote" if self.exe_remote else "Local"))
 
