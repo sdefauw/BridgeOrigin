@@ -106,7 +106,7 @@ class Farm(server.Farm):
                 log.warning("Type of server undefined: using basic sever by default")
             else:
                 serverClass = self.type_of_server_available[s["type"]]
-            s_obj = serverClass(s["key"], s["name"], [c for c in self.clusters if c.name == s["cluster"]][0], s["group"])
+            s_obj = serverClass(str(s["key"]), s["name"], [c for c in self.clusters if c.name == s["cluster"]][0], s["group"])
             s_obj.set_ssh_info(s["hostname"], s["ssh"]["user"],
                                passwd=s["ssh"]["passwd"] if 'passwd' in s['ssh'] else None,
                                pkey_path=s['ssh']['pkey'] if 'pkey' in s['ssh'] else None)

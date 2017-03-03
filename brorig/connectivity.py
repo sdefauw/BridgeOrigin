@@ -3,9 +3,13 @@
 
 from __future__ import absolute_import, division, print_function
 
+import base64
 import subprocess
+
+import os
 import pymysql
 import paramiko
+import uuid
 
 import brorig.log as log
 import brorig.config as config
@@ -87,43 +91,63 @@ class Script:
 
     def exe(self):
         # TODO fast remote execution (one line). Don't use remote transfer in tmp script
-        # Open SSH connection
-        self.connection.open_ssh_connexion()
-        # Write file script
-        path_script = '/tmp/script'
+
+        # Define script name
+        path_script = '/tmp/brorig_{0!s}'.format(base64.b32encode(uuid.uuid4().bytes)[:26])
+
+        # Create local script file
         if not self.file_name:
             f = open(path_script, 'w')
             f.write(self.code)
             f.close()
-        # Transfer if needed
+
+        chan = None
+        # Transfer script to remote server if needed
         if self.exe_remote:
+            self.connection.open_ssh_connexion()
+            chan = self.connection.connection.get_transport().open_session()
             t = Transfer(self.connection.transport)
             t.put(self.file_name if self.file_name else path_script, path_script)
-        # Execute script
-        starter_script = self.interpret
-        if self.sudo:
-            starter_script = "sudo " + starter_script
-        cmd = starter_script + ' ' + path_script
-        cmd += ((" " + (
-            " ".join([("-" if len(str(arg)) == 1 else "--") + str(arg) + " " + str(val) for arg, val in
-                      self.args.iteritems()]))) if self.args != {} else "")
+
+        # Script execution
+        cmd = '{sudo}{interpret} {script} {args}'.format(
+            sudo=("sudo " if self.sudo else ""),
+            interpret=self.interpret,
+            script=path_script,
+            args=" ".join([("-" if len(str(arg)) == 1 else "--") + str(arg) + " " + str(val) for arg, val in
+                            self.args.iteritems()]))
+
+        log.info("{1} code execution: {0:.100}".format(self.code, "Remote" if self.exe_remote else "Local"))
+        log.debug("Launch {1} command: {0}".format(cmd, "remote" if self.exe_remote else "local"))
+
         if self.exe_remote:
-            log.info("Remote command execution: %s" % cmd)
-            _, stdout, stderr = self.connection.connection.exec_command(cmd)
-            err = stderr.read()
-            out = stdout.read()
-            if err and not self.ignore_error:
-                self.connection.close_ssh_connexion()
-                raise Exception('Remote script execution: ' + err)
+            # Remote execution
+            chan.exec_command(cmd)
+            stdout = chan.makefile('r', -1)
+            stderr = chan.makefile_stderr('r', -1)
+            self.err = stderr.read()
+            self.out = stdout.read()
+            return_code = chan.recv_exit_status()
         else:
-            log.info("Local command execution: %s" % cmd)
+            # Local execution
             p = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
-            out, err = p.communicate()
-            if err and not self.ignore_error:
-                self.connection.close_ssh_connexion()
-                raise Exception('Local script execution: ' + err)
-        self.connection.close_ssh_connexion()
-        return out
+            self.out, self.err = p.communicate()
+            return_code = p.returncode
+
+        # Remove script
+        os.remove(path_script)
+        if self.exe_remote:
+            self.connection.connection.exec_command("rm -rf {}".format(path_script))
+
+        # Close remote connection
+        if self.exe_remote:
+            self.connection.close_ssh_connexion()
+
+        # Error handler
+        if return_code != 0 and not self.ignore_error:
+            raise Exception('{1} script execution error: {0}'.format(self.err, "Remote" if self.exe_remote else "Local"))
+
+        return self.out
 
     @staticmethod
     def remote_exe(connect, cmd=None, filename=None):
