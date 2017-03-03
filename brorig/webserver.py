@@ -291,7 +291,9 @@ class TimelinePacketProcessHelper(threading.Thread):
 
     def __gen_packet_list(self, list):
         def time_format(t):
-            return calendar.timegm(UTC.localize(t).timetuple()) * 1e3 + t.microsecond / 1e3 if t else None
+            if t and not t.tzinfo:
+                t = UTC.localize(t)
+            return calendar.timegm(t.astimezone(UTC).timetuple()) * 1e3 + t.microsecond / 1e3 if t else None
 
         p_list_to_transfer = [(item, p) for item in list for p in item.packet_list() if p.src and p.src["time"] ]
         # Remove packet already transferred
