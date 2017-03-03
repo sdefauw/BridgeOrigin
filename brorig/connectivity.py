@@ -35,25 +35,25 @@ class Connection:
         self.host = host
         self.username = username
         self.passwd = passwd
-        self.pkey = None
-        if pkey_path:
-            self.pkey = paramiko.RSAKey.from_private_key_file(pkey_path)
+        self.key_filename = pkey_path
 
     def open_ssh_connexion(self):
         self.connection = paramiko.SSHClient()
         self.connection.load_system_host_keys()
         self.connection.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-        self.connection.connect(self.host, port=22, username=self.username, password=self.passwd, pkey=self.pkey, timeout=10)
-        self.connect_trans = paramiko.Transport((self.host, 22))
-        self.connect_trans.connect(username=self.username, password=self.passwd, pkey=self.pkey)
-        self.transport = paramiko.SFTPClient.from_transport(self.connect_trans)
+        self.connection.connect(self.host,
+                                port=22,
+                                username=self.username,
+                                password=self.passwd,
+                                key_filename=self.key_filename,
+                                timeout=10)
+        self.transport = self.connection.open_sftp()
         log.debug("SSH connection established with %s" % self.host)
 
     def close_ssh_connexion(self):
-        self.connect_trans.close()
+        self.transport.close()
         self.connection.close()
         del self.connection
-        del self.connect_trans
         del self.transport
         log.debug("Remote connection (%s) closed" % self.host)
 
