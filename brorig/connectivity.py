@@ -101,9 +101,11 @@ class Script:
             f.write(self.code)
             f.close()
 
+        chan = None
         # Transfer script to remote server if needed
         if self.exe_remote:
             self.connection.open_ssh_connexion()
+            chan = self.connection.connection.get_transport().open_session()
             t = Transfer(self.connection.transport)
             t.put(self.file_name if self.file_name else path_script, path_script)
 
@@ -120,14 +122,16 @@ class Script:
 
         if self.exe_remote:
             # Remote execution
-            _, stdout, stderr = self.connection.connection.exec_command(cmd)
-            err = stderr.read()
-            out = stdout.read()
-            return_code = self.connection.connection.recv_exit_status()
+            chan.exec_command(cmd)
+            stdout = chan.makefile('r', -1)
+            stderr = chan.makefile_stderr('r', -1)
+            self.err = stderr.read()
+            self.out = stdout.read()
+            return_code = chan.recv_exit_status()
         else:
             # Local execution
             p = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
-            out, err = p.communicate()
+            self.out, self.err = p.communicate()
             return_code = p.returncode
 
         # Remove script
@@ -141,11 +145,9 @@ class Script:
 
         # Error handler
         if return_code != 0 and not self.ignore_error:
-            raise Exception('{1} script execution error: {0}'.format(err, "Remote" if self.exe_remote else "Local"))
+            raise Exception('{1} script execution error: {0}'.format(self.err, "Remote" if self.exe_remote else "Local"))
 
-        # End script execution
-        self.connection.close_ssh_connexion()
-        return out
+        return self.out
 
     @staticmethod
     def remote_exe(connect, cmd=None, filename=None):
