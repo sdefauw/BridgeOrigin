@@ -76,9 +76,15 @@ class ConfigurationSnifferHandler(tornado.web.RequestHandler):
 
     def __apply_sniffer_action(self, server_list, action):
         servers = self.__get_server(server_list)
+        th_pool = []
         for server in servers:
             for sniffer in server.sniffers:
-                action(server, sniffer)
+                th = threading.Thread(target=action,
+                                      args=(server, sniffer))
+                th_pool.append(th)
+                th.start()
+        for th in th_pool:
+            th.join()
 
     def get(self):
         servers = self.__get_server(self.get_argument("serverskey").split(','))
