@@ -388,6 +388,41 @@ svg.timeline {
     width: 150px;
 }
 
+.filter-bar .filter-button {
+    fill:none;
+    stroke:#969696;
+    stroke-miterlimit:10;
+    margin: 5px;
+    cursor: pointer;
+    float: left;
+}
+
+.filter-bar .filter-button.selected {
+    fill: rgba(0, 204, 255, .5);
+    stroke: white;
+}
+.filter-bar .filter-button.selected circle{
+    stroke: rgba(0, 204, 255, .75);
+}
+
+.filter-bar .filter-button:hover {
+    stroke: rgba(0, 204, 255, .75);
+}
+
+.filter-bar .descr {
+    display: block;
+    float: left;
+    font-size: 11px;
+    margin: 0 5px;
+}
+
+.filter-bar .descr span {
+    display: block;
+}
+
+.filter-bar .descr span.filter-name {
+    color: rgba(0, 204, 255, .75);
+}
 
 #server-config {
     width: 300px;

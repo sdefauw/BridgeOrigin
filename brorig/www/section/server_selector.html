@@ -1,6 +1,6 @@
 <div ng-controller="ServerSelectorController as serverselector" ng-show="serverselector.display()" class="selectbox">
     <img src="{{ static_url('img/x.svg') }}" ng-click="serverselector.close()" class="close"/>
-    <input type="text" ng-model="searchkeys" placeholder="Search" name="searchkeys" ng-keyup="serverselector.search()"
+    <input type="text" ng-model="searchKeywords" placeholder="Search" name="searchkeys" ng-keyup="serverselector.search()"
            id="search"/>
     <span>Select servers to monitor</span>
 
@@ -14,5 +14,25 @@
             </li>
         </ul>
     </div>
-    <button ng-click="serverselector.process()" style="width: 100px;float: right;margin: 5px;">Select</button>
+
+    <div>
+        <div class="filter-bar">
+            <svg version="1.1"
+                 xmlns="http://www.w3.org/2000/svg"
+                 x="0px" y="0px" width="17px" height="17px" viewBox="0 0 17 17" style="enable-background:new 0 0 17 17;" xml:space="preserve"
+                    ng-click="serverselector.setFilter('selected')" ng-class="['filter-button', {selected: serverselector.filterApplied.indexOf('selected')>=0}]">
+                <circle cx="8.5" cy="8.5" r="8"/>
+                <g>
+                    <line x1="3.5" y1="6.9" x2="13.5" y2="6.9"/>
+                    <line x1="4.5" y1="8.8" x2="12.5" y2="8.8"/>
+                    <line x1="5.5" y1="10.7" x2="11.5" y2="10.7"/>
+                </g>
+            </svg>
+            <div class="descr" ng-show="serverselector.filterApplied.length > 0">
+                <span>Filter</span>
+                <span class="filter-name">{{! serverselector.filterApplied.join() }}</span>
+            </div>
+        </div>
+        <button ng-click="serverselector.process()" style="width: 100px;float: right;margin: 5px;">Select</button>
+    </div>
 </div>

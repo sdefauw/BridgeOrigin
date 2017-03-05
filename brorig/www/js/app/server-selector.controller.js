@@ -10,6 +10,8 @@
 
         var ssc = {
             serversFiltered: null,
+            searchKeywords: null,
+            filterApplied: [],
 
             servers: function () {
                 if (ssc.serversFiltered == null)
@@ -49,15 +51,32 @@
                 }
             },
 
+            applyFilters: function () {
+                ssc.serversFiltered = sss.servers;
+                // Re-compute all filters
+                ssc.serversFiltered = sss.servers;
+                for (var i in ssc.filterApplied) {
+                    var filterName = ssc.filterApplied[i];
+                    var ff = ssc.filters[filterName];
+                    if (!ff) continue;
+                    ssc.serversFiltered = ff(ssc.serversFiltered);
+                }
+                // Re-compute search filters
+                ssc.searchFilter();
+            },
+
             search: function () {
-                var keyword = $scope.searchkeys;
-                if (!keyword || keyword == '') {
-                    ssc.serversFiltered = sss.servers;
+                ssc.searchKeywords = $scope.searchKeywords;
+                ssc.applyFilters();
+            },
+
+            searchFilter: function () {
+                if (!ssc.searchKeywords || ssc.searchKeywords == '') {
                     return;
                 }
-                var keywords = keyword.split(" ");
+                var keywords = ssc.searchKeywords.split(" ");
                 var list = [];
-                sss.servers.forEach(function (item) {
+                ssc.serversFiltered.forEach(function (item) {
                     var s = item.key + " " + item.name + " " + item.group;
                     var d = false;
                     keywords.forEach(function (keyword) {
@@ -69,6 +88,33 @@
                         list.push(item);
                 });
                 ssc.serversFiltered = list;
+            },
+
+            setFilter: function (filter) {
+                if (filter) {
+                    // Check if filter exist
+                    if (!ssc.filters[filter]) {
+                        return;
+                    }
+                    // Enable/Disable the filter
+                    if (ssc.filterApplied.indexOf(filter) < 0) {
+                        ssc.filterApplied.push(filter);
+                    } else {
+                        ssc.filterApplied = ssc.filterApplied.filter(function (item) {
+                            return item != filter;
+                        });
+                    }
+                }
+                // Apply filters
+                ssc.applyFilters();
+            },
+
+            filters: {
+                selected: function (list) {
+                    return list.filter(function (item) {
+                        return item.selected;
+                    });
+                }
             }
 
         };
