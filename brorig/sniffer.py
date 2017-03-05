@@ -106,3 +106,27 @@ class Packet:
                 dst=self.dst['server'].key if self.dst['server'] else None
             )
         )
+
+    @staticmethod
+    def criterion():
+        """
+        List of criterion that will display in the we UI
+        
+        :return: list of criterion
+        [
+            dict(
+                name= <Name of the criterion>
+                criterion= <search engine value criterion>
+                type= <type of criterion>
+                value= <values that take the criterion
+            ),
+            ...
+        ]
+        """
+        # TODO time
+        # TODO support protocol
+        # TODO support category
+        return [
+            dict(name="Server source", criterion="server.src", type="str"),
+            dict(name="Server destination", criterion="server.dst", type="str")
+        ]

@@ -29,7 +29,12 @@
                     open: false
                 },
                 search: {
-                    criterion: {},
+                    criterion: function (crit) {
+                        if (!crit) {
+                            return ss.search.filter.criterion
+                        }
+                        return ss.search.filter.criterion[crit]
+                    },
                     match: []
                 }
             },

@@ -60,14 +60,14 @@
                 <input type="text" ng-model="match.criterion" list="searchCriterion"
                        name="searchCrit" ng-change="sc.updateSearchMatch()" class="criterion"/>
                 <datalist id="searchCriterion">
-                    <option ng-repeat="(crit, value) in sc.pickers.search.criterion" value="{{!crit}}">{{!crit}}
+                    <option ng-repeat="(crit, c_info) in sc.pickers.search.criterion()" value="{{!crit}}">{{!c_info.name}}
                     </option>
                 </datalist>
                 <input ng-model="match.value"
                        type="text" ng-change="sc.updateSearchMatch()" class="value"
-                       list="searchCriterionValue{{!match.criterion}}"/>
-                <datalist id="searchCriterionValue{{!match.criterion}}">
-                    <option ng-repeat="option in sc.pickers.search.criterion[match.criterion].values" value="{{!option}}">
+                       list="searchCriterionValue.{{!match.criterion}}"/>
+                <datalist id="searchCriterionValue.{{!match.criterion}}">
+                    <option ng-repeat="c_val in sc.pickers.search.criterion[match.criterion].value" value="{{!c_val}}">
                         {{!option}}
                     </option>
                 </datalist>

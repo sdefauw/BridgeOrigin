@@ -52,7 +52,7 @@ class SearchManager:
         del serialized_filter['time']
         if serialized_filter == {}:
             return None
-        macthes = {"macth": i for i in serialized_filter}
+        macthes = {"match": {c: v} for (c, v) in serialized_filter.iteritems()}
         result = self.es.search(index=self.index, doc_type='packets', body={
             "query": {
                 "bool": {

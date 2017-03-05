@@ -119,6 +119,31 @@ class ProtocolHandler(tornado.web.RequestHandler):
         self.write(json.dumps(p))
 
 
+class SearchCriterionsHandler(tornado.web.RequestHandler):
+    def get(self):
+        """
+        Get list of all criterion used in the client network
+        
+        :return: a json of all criterion available in the select network
+        {
+            <criterion value that will be used in search engine>: {
+                "name": <name of the criterion>,
+                "type": "str"|"list",
+                ("value": <list of value>)
+            },
+            ...
+        }
+        """
+        # Find graph
+        client = self.get_argument("clientID")
+        network = clientsList.find(client).network
+        # List all type of packets
+        p_list = list(set([p for l in network.nodes for s in l.server.sniffers for p in s.packets_supported()]))
+        # Post process
+        c = {c['criterion']: dict(name=c['name'], type=c['type']) for c in p.criterion() for p in p_list}
+        self.write(json.dumps(c))
+
+
 class PacketHandler(tornado.web.RequestHandler):
     def get(self):
         global clientsList
@@ -221,6 +246,7 @@ class Application(tornado.web.Application):
             (r"/packet", PacketHandler),
             (r"/configure/sniffer", ConfigurationSnifferHandler),
             (r'/protocol', ProtocolHandler),
+            (r'/search/criterion', SearchCriterionsHandler),
             (r"/custom/(.*)", tornado.web.StaticFileHandler, {"path": os.path.join(custom.dir, "www")}),
             (r"/include/(.*)", tornado.web.StaticFileHandler, {"path": os.path.join(os.path.dirname(__file__), "www")}),
         ]
