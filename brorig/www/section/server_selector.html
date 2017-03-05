@@ -1,6 +1,6 @@
 <div ng-controller="ServerSelectorController as serverselector" ng-show="serverselector.display()" class="selectbox">
     <img src="{{ static_url('img/x.svg') }}" ng-click="serverselector.close()" class="close"/>
-    <input type="text" ng-model="searchKeywords" placeholder="Search" name="searchkeys" ng-keyup="serverselector.search()"
+    <input type="text" ng-model="serverselector.searchKeywords" placeholder="Search" name="searchkeys" ng-keyup="serverselector.search()"
            id="search"/>
     <span>Select servers to monitor</span>
 

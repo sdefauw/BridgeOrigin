@@ -2,11 +2,10 @@
 
     angular.module('app')
         .controller('ServerSelectorController', [
-            '$scope',
             'ServerSelectorService', 'PageService',
             ServerSelectorController]);
 
-    function ServerSelectorController($scope, sss, ps) {
+    function ServerSelectorController(sss, ps) {
 
         var ssc = {
             serversFiltered: null,
@@ -66,7 +65,6 @@
             },
 
             search: function () {
-                ssc.searchKeywords = $scope.searchKeywords;
                 ssc.applyFilters();
             },
 
