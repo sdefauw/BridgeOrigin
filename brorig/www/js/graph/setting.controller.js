@@ -7,9 +7,6 @@
 
         var setting = {
             adder: {},
-            menu: {
-                selected: "filter"
-            },
             timeFilterOptions: [
                 {label: '30 s', value: 30},
                 {label: '1 min', value: 60},
@@ -49,11 +46,11 @@
             },
 
             isActiveMenu: function (type) {
-                return setting.menu.selected === type ? 'selected' : '';
+                return ss.menu.selected === type ? 'selected' : '';
             },
 
             selectMenu: function (type) {
-                setting.menu.selected = type;
+                ss.menu.selected = type;
             },
 
             tfilterSelect: function () {

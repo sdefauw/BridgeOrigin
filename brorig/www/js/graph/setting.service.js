@@ -8,6 +8,9 @@
         var ss = {
             protocols: {},
             display: false,
+            menu: {
+                selected: "search"
+            },
             search: {
                 filter: {
                     time: {
