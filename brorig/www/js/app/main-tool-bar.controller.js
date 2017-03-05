@@ -2,38 +2,28 @@
 
     angular.module('app')
         .controller('MainToolBarController', [
-            '$scope',
             'ServerConfigService', 'ServerSelectorService', MainToolBarController]);
 
-    function MainToolBarController($scope, ServerConfig, sss) {
+    function MainToolBarController(ServerConfig, sss) {
         var tab;
 
-        $scope.back_button = history.length > 1;
+        var mtb = {
 
-        $scope.seTab = function (newValue) {
-            tab = newValue;
+            serverConfig: function () {
+                tab = 'config';
+                ServerConfig.display = !ServerConfig.display;
+                if (ServerConfig.display) {
+                    ServerConfig.configure.update_status();
+                }
+            },
+
+            selectServer: function () {
+                tab = 'serverselect';
+                sss.display = !sss.display;
+            },
+
         };
 
-        $scope.isSet = function (tabName) {
-            return tab === tabName;
-        };
-
-        $scope.serverConfig = function () {
-            tab = 'config';
-            ServerConfig.display = !ServerConfig.display;
-            if (ServerConfig.display) {
-                ServerConfig.configure.update_status();
-            }
-        };
-
-        $scope.selectSERVER = function () {
-            tab = 'serverselect';
-            sss.display = !sss.display;
-        };
-
-        $scope.refresh = function () {
-            tab = 'refresh';
-            sss.process();
-        }
+        return mtb;
     }
 })();
