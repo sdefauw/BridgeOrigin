@@ -48,7 +48,7 @@ class TimelinePacketProcessHelper(threading.Thread):
         return [{
                     "uuid": p.uuid,
                     "category": p.category,
-                    "protocol": p.protocol,
+                    "protocol": p.protocol(),
                     "start": time_format(p.src["time"]) if p.src else None,
                     "end": time_format(p.dst["time"]) if p.dst else None,
                     "lane": item.uuid

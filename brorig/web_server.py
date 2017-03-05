@@ -109,7 +109,7 @@ class ProtocolHandler(tornado.web.RequestHandler):
         client = self.get_argument("clientID")
         network = clientsList.find(client).network
         # Protocol needed
-        p_list = list(set([p for l in network.nodes for s in l.server.sniffers for p in s.protocol_used()]))
+        p_list = list(set([p.protocol() for l in network.nodes for s in l.server.sniffers for p in s.packets_supported()]))
         # Load all protocol description available
         protocol = self.load_json('www/packet/protocol.json')
         protocol_custom = self.load_json(custom.dir + "protocol.json")

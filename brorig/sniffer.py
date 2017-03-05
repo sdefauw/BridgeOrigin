@@ -34,10 +34,10 @@ class Sniffer:
     def get_packets(self, filter, tmp_dir):
         pass
 
-    def protocol_used(self):
+    def packets_supported(self):
         """
-        List of all protocol used by this sniffer
-        :return: List of protocol key defined in protocol.json
+        List of all packet supported by this sniffer
+        :return: List of `.Packet` instance supported
         """
         return []
 
@@ -45,15 +45,23 @@ class Sniffer:
 class Packet:
     ST_INIT, ST_NEW, ST_UPDATED, ST_TRANSFERRED, ST_IGNORED = range(5)
 
-    def __init__(self, protocol, category):
+    def __init__(self, category):
         self.category = category
-        self.protocol = protocol
         self.src = None
         self.dst = None
         self.internal = False
         self.uuid = base64.b32encode(uuid.uuid4().bytes)[:26]
         self.correlate_key = None
         self.state = Packet.ST_INIT
+
+    @staticmethod
+    def protocol():
+        """
+        Get the protocol of the packet
+        
+        :return: str Protocol name support by the packet (defined in protocol.json)
+        """
+        raise Exception("protocol is an abstract method")
 
     def set_src(self, server, time=None):
         self.src = {
@@ -87,7 +95,7 @@ class Packet:
         :return: data collection searchable
         """
         return dict(
-            protocol=self.protocol,
+            protocol=self.protocol(),
             category=self.category,
             time=dict(
                 start=calendar.timegm(self.src['time'].timetuple()) if self.src['time'] else 0,
