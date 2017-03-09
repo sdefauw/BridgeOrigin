@@ -57,6 +57,7 @@
         <h1>Search engine criterion</h1>
         <section id="search-engine">
             <form ng-repeat="match in sc.pickers.search.match" ng-submit="sc.updateSearchMatch()">
+                <img src="{{ static_url('img/x.svg') }}" ng-click="sc.removeCriteria(match)" class="close">
                 <input type="text" ng-model="match.criterion" list="searchCriterion"
                        name="searchCrit" ng-change="sc.updateSearchMatch()" class="criterion"/>
                 <datalist id="searchCriterion">

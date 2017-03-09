@@ -104,6 +104,7 @@
 #search-engine form {
     display: inline-block;
     margin: 5px;
+    position: relative;
 }
 
 #search-engine input {
@@ -122,4 +123,16 @@
     background: white !important;
     border-radius: 0 10px 10px 0 !important;
     margin-left: -5px !important;
+}
+
+#search-engine .close {
+    padding: 7px 3px;
+    position: absolute;
+    display: none;
+    height: 7px;
+    right: 5px;
+}
+
+#search-engine form:hover .close {
+    display: block;
 }

@@ -72,6 +72,12 @@
                 });
             },
 
+            removeCriteria: function (c) {
+                setting.pickers.search.match = setting.pickers.search.match.filter(function (item) {
+                    return item != c;
+                });
+            },
+
             updateSearchMatch: function () {
                 var f = {};
                 for(var i in setting.pickers.search.match) {
