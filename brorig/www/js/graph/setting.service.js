@@ -8,6 +8,9 @@
         var ss = {
             protocols: {},
             display: false,
+            menu: {
+                selected: "search"
+            },
             search: {
                 filter: {
                     time: {
@@ -28,12 +31,15 @@
                                 'to': ss.search.filter.time.to
                             };
                         }
-                    }
+                    },
+                    match: null,
+                    criterion: []
                 }
             }
         };
 
         cs.network.callbacks.push(function () {
+            // Get list of protocol
             $http.get("protocol", {
                 params: {
                     clientID: cs.client.data.uuid
@@ -46,6 +52,14 @@
                     if (!protocolObj.filter) continue;
                     ss.protocols[protocol].selected = protocolObj.filter;
                 }
+            });
+            // Get list of search criterion
+            $http.get("search/criterion", {
+                params: {
+                    clientID: cs.client.data.uuid
+                }
+            }).then(function (res) {
+                ss.search.filter.criterion = res.data;
             });
         });
 

@@ -1,8 +1,8 @@
 
 #gsetting {
     width: 600px;
-    height: 300px;
-    margin: -150px 0 0 -300px;
+    height: 400px;
+    margin: -200px 0 0 -300px;
 }
 
 #gsetting h1,
@@ -98,4 +98,41 @@
 
 #gsetting .time-interval span.fromto  {
     margin-left: 5px;
+}
+
+
+#search-engine form {
+    display: inline-block;
+    margin: 5px;
+    position: relative;
+}
+
+#search-engine input {
+    margin: 0 !important;
+    width: initial !important;
+    display: inline !important;
+}
+
+#search-engine input.criterion {
+    background: rgba(0, 204, 255, .15) !important;
+    border-radius: 10px 0 0 10px !important;
+    width: 68px !important;
+}
+
+#search-engine input.value {
+    background: white !important;
+    border-radius: 0 10px 10px 0 !important;
+    margin-left: -5px !important;
+}
+
+#search-engine .close {
+    padding: 7px 3px;
+    position: absolute;
+    display: none;
+    height: 7px;
+    right: 5px;
+}
+
+#search-engine form:hover .close {
+    display: block;
 }

@@ -3,10 +3,10 @@
     angular.module('app')
         .service('ServerSelectorService', [
             '$http',
-            'PageService', 'AlertService', 'GraphManager', 'ChannelService',
+            'PageService', 'AlertService', 'GraphManager', 'SettingService', 'ChannelService',
             ServerServiceController]);
 
-    function ServerServiceController($http, page, al, gm, cs) {
+    function ServerServiceController($http, page, al, gm, ss, cs) {
 
         var sss = {
             display: true,
@@ -34,8 +34,8 @@
                 // Request packet when the network is loaded
                 cs.network.callbacks["update_timeline"] = function () {
                     cs.network.callbacks["update_timeline"] = null;
-                    gm.packet.request(true);
-                    gm.timeline.state = "refreshing";
+                    ss.display = true;
+                    ss.menu.selected = "search";
                 };
                 // Loading progress
                 page.load.display();

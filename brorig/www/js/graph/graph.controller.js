@@ -104,8 +104,12 @@
                 return gm.timeline.realTime;
             },
 
-            showSetting: function () {
+            showSetting: function (section) {
                 ss.display = !ss.display;
+                if (!section) {
+                    return;
+                }
+                ss.menu.selected = section;
             },
 
             filter: function () {
@@ -142,7 +146,14 @@
                 combo: 'f',
                 description: 'Open filter panel',
                 callback: function() {
-                    gc.showSetting();
+                    gc.showSetting('filter');
+                }
+            })
+            .add({
+                combo: 's',
+                description: 'Open search panel',
+                callback: function() {
+                    gc.showSetting('search');
                 }
             })
             .add({

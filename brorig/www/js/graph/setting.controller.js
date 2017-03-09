@@ -7,9 +7,6 @@
 
         var setting = {
             adder: {},
-            menu: {
-                selected: "filter"
-            },
             timeFilterOptions: [
                 {label: '30 s', value: 30},
                 {label: '1 min', value: 60},
@@ -27,6 +24,15 @@
                 to:{
                     date: new Date(),
                     open: false
+                },
+                search: {
+                    criterion: function (crit) {
+                        if (!crit) {
+                            return ss.search.filter.criterion
+                        }
+                        return ss.search.filter.criterion[crit]
+                    },
+                    match: []
                 }
             },
 
@@ -40,11 +46,11 @@
             },
 
             isActiveMenu: function (type) {
-                return setting.menu.selected === type ? 'selected' : '';
+                return ss.menu.selected === type ? 'selected' : '';
             },
 
             selectMenu: function (type) {
-                setting.menu.selected = type;
+                ss.menu.selected = type;
             },
 
             tfilterSelect: function () {
@@ -57,6 +63,29 @@
                 setting.timeSelection = 'from_to';
                 ss.search.filter.time.from = setting.pickers.from.date;
                 ss.search.filter.time.to = setting.pickers.to.date;
+            },
+
+            addSearchCritiron: function () {
+                setting.pickers.search.match.push({
+                    criterion: "",
+                    value: ""
+                });
+            },
+
+            removeCriteria: function (c) {
+                setting.pickers.search.match = setting.pickers.search.match.filter(function (item) {
+                    return item != c;
+                });
+            },
+
+            updateSearchMatch: function () {
+                var f = {};
+                for(var i in setting.pickers.search.match) {
+                    var line = setting.pickers.search.match[i];
+                    if (!line.value) continue;
+                    f[line.criterion] = line.value;
+                }
+                ss.search.filter.match = f;
             },
 
             filtersAvailable: function () {

@@ -13,10 +13,7 @@
             packet: {
                 callbacks: [],
                 config: {
-                    filter: function (filter) {
-                        // TODO
-                        console.error("TODO filter");
-                    },
+                    filter: null,
                     realTime: function (enable) {
                         ws.send(JSON.stringify({
                             timeline: {
@@ -33,7 +30,8 @@
                             packet: {
                                 from: from,
                                 to: to ? to : "now"
-                            }
+                            },
+                            filter: cs.packet.config.filter
                         }
                     }));
                 }

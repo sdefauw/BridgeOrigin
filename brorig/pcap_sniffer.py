@@ -29,7 +29,7 @@ class PcapFileSniffer(sniffer.Sniffer):
             protocol_link = protocol_supported[protocol_name]
             cat_fun = protocol_link['category']
             packet_type = protocol_link['packet']
-            p = packet_type(packet[protocol_name], protocol_name, cat_fun(eval("packet.%s" % protocol_link['pcap_link'])))
+            p = packet_type(packet[protocol_name], cat_fun(eval("packet.%s" % protocol_link['pcap_link'])))
             src = packet[self.connectivity_layer].src
             dst = packet[self.connectivity_layer].dst
             time = datetime.datetime.utcfromtimestamp(float(packet.sniff_timestamp))
@@ -49,8 +49,8 @@ class PcapFileSniffer(sniffer.Sniffer):
         cap = pyshark.FileCapture(file_path)
         self.__process_cap(cap)
 
-    def protocol_used(self):
-        return self.protocols
+    def packets_supported(self):
+        return [protocol_supported[p]['packet'] for p in self.protocols]
 
 
 class PcapRemoteSniffer(PcapFileSniffer):
@@ -104,8 +104,8 @@ class PcapRemoteSniffer(PcapFileSniffer):
 
 
 class CapPacket(sniffer.Packet):
-    def __init__(self, packet, protocol, category):
-        sniffer.Packet.__init__(self, protocol, category)
+    def __init__(self, packet, category):
+        sniffer.Packet.__init__(self, category)
         self.packet = packet
 
     def equals(self, other):
@@ -121,8 +121,12 @@ class CapPacket(sniffer.Packet):
 
 
 class HttpPacket(CapPacket):
-    def __init__(self, packet, protocol, category):
-        CapPacket.__init__(self, packet, protocol, category)
+    def __init__(self, packet, category):
+        CapPacket.__init__(self, packet, category)
+
+    @staticmethod
+    def protocol():
+        return 'HTTP'
 
     def equals(self, other):
         if not isinstance(other, HttpPacket):
