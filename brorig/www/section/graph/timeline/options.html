@@ -4,7 +4,8 @@
         <a ng-class="{ selected: sc.isActiveMenu('filter')}" ng-click="sc.selectMenu('filter')">Filter</a>
     </nav>
 
-    <div class="subsection" ng-repeat="(protocol, filter) in sc.filtersAvailable()" ng-show="sc.isActiveMenu('filter')">
+    <div class="subsection" ng-repeat="(protocol, filter) in sc.filtersAvailable()" ng-show="sc.isActiveMenu('filter')"
+        style="height: 370px; overflow: auto;">
         <h1 class="title">{{!filter.name }} ({{!filter.desc}})</h1>
         <ul class="filterbox">
             <li ng-repeat="regex in filter.selected" title="{{!filter.category[regex].desc}}">
@@ -24,17 +25,18 @@
     </div>
 
     <div ng-show="sc.isActiveMenu('search')">
-        <h1>Time processing interval</h1>
-        <section class="time-interval">
-            <label class="radio">
-                <input type="radio" ng-model="sc.timeSelection" value="until_now">
-                <label for="tfilter">Duration until now</label>
-                <select name="tfilter" id="tfilter" ng-model="sc.tfilter" ng-change="sc.tfilterSelect()" ng-options="opt as opt.label for opt in sc.timeFilterOptions" style="font-size: 11px;">
-                </select>
-            </label>
-            <label class="radio" style="display: inline-flex;">
-                <input type="radio" ng-model="sc.timeSelection" value="from_to">
-                <span class="fromto">
+        <section style="height: 346px; overflow: auto;">
+            <h1>Time processing interval</h1>
+            <section class="time-interval">
+                <label class="radio">
+                    <input type="radio" ng-model="sc.timeSelection" value="until_now">
+                    <label for="tfilter">Duration until now</label>
+                    <select name="tfilter" id="tfilter" ng-model="sc.tfilter" ng-change="sc.tfilterSelect()" ng-options="opt as opt.label for opt in sc.timeFilterOptions" style="font-size: 11px;">
+                    </select>
+                </label>
+                <label class="radio" style="display: inline-flex;">
+                    <input type="radio" ng-model="sc.timeSelection" value="from_to">
+                    <span class="fromto">
                     From:
                     <p class="datetime-picker-group input-group">
                         <input type="text" class="form-control main" datetime-picker ng-model="sc.pickers.from.date" is-open="sc.pickers.from.open" button-bar="sc.pickers.from.buttonBar" ng-change="sc.pickerSelect()"  />
@@ -43,7 +45,7 @@
                         </span>
                     </p>
                 </span>
-                <span class="fromto">
+                    <span class="fromto">
                     To:
                     <p class="datetime-picker-group input-group">
                         <input type="text" class="form-control main" datetime-picker ng-model="sc.pickers.to.date" is-open="sc.pickers.to.open" button-bar="sc.pickers.to.buttonBar" ng-change="sc.pickerSelect()"  />
@@ -52,28 +54,29 @@
                         </span>
                     </p>
                 </span>
-            </label>
-        </section>
-        <h1>Search engine criterion</h1>
-        <section id="search-engine">
-            <form ng-repeat="match in sc.pickers.search.match" ng-submit="sc.updateSearchMatch()">
-                <img src="{{ static_url('img/x.svg') }}" ng-click="sc.removeCriteria(match)" class="close">
-                <input type="text" ng-model="match.criterion" list="searchCriterion"
-                       name="searchCrit" ng-change="sc.updateSearchMatch()" class="criterion"/>
-                <datalist id="searchCriterion">
-                    <option ng-repeat="(crit, c_info) in sc.pickers.search.criterion()" value="{{!crit}}">{{!c_info.name}}
-                    </option>
-                </datalist>
-                <input ng-model="match.value"
-                       type="text" ng-change="sc.updateSearchMatch()" class="value"
-                       list="searchCriterionValue.{{!match.criterion}}"/>
-                <datalist id="searchCriterionValue.{{!match.criterion}}">
-                    <option ng-repeat="c_val in sc.pickers.search.criterion[match.criterion].value" value="{{!c_val}}">
-                        {{!option}}
-                    </option>
-                </datalist>
-            </form>
-            <button type="button" ng-click="sc.addSearchCritiron()">+</button>
+                </label>
+            </section>
+            <h1>Search engine criterion</h1>
+            <section id="search-engine">
+                <form ng-repeat="match in sc.pickers.search.match" ng-submit="sc.updateSearchMatch()">
+                    <img src="{{ static_url('img/x.svg') }}" ng-click="sc.removeCriteria(match)" class="close">
+                    <input type="text" ng-model="match.criterion" list="searchCriterion"
+                           name="searchCrit" ng-change="sc.updateSearchMatch()" class="criterion"/>
+                    <datalist id="searchCriterion">
+                        <option ng-repeat="(crit, c_info) in sc.pickers.search.criterion()" value="{{!crit}}">{{!c_info.name}}
+                        </option>
+                    </datalist>
+                    <input ng-model="match.value"
+                           type="text" ng-change="sc.updateSearchMatch()" class="value"
+                           list="searchCriterionValue.{{!match.criterion}}"/>
+                    <datalist id="searchCriterionValue.{{!match.criterion}}">
+                        <option ng-repeat="c_val in sc.pickers.search.criterion[match.criterion].value" value="{{!c_val}}">
+                            {{!option}}
+                        </option>
+                    </datalist>
+                </form>
+                <button type="button" ng-click="sc.addSearchCritiron()">+</button>
+            </section>
         </section>
         <button ng-click="gc.refresh_action(false); gc.showSetting();" style="width: 100px;float: right;margin: 5px;">Get packets</button>
     </div>
