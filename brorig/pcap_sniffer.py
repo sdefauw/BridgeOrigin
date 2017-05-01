@@ -3,10 +3,12 @@
 
 from __future__ import absolute_import, division, print_function
 
+import base64
 import pyshark
 import os
 import re
 import datetime
+import uuid
 
 import brorig.custom as custom
 import brorig.sniffer as sniffer
@@ -58,7 +60,7 @@ class PcapRemoteSniffer(PcapFileSniffer):
         PcapFileSniffer.__init__(self, server, protocols, conn_layer)
         self.ports = ports
         self.filter = filter
-        self.remote_file_path = "/tmp/brorig.pcap"
+        self.remote_file_path = "/tmp/brorig_{0!s}.pcap".format(base64.b32encode(uuid.uuid4().bytes)[:26])
         ports_arg = "" if not self.ports else " or ".join("port %d" % i for i in self.ports)
         filter_arg = "" if not self.filter else self.filter
         self.cmd = re.sub(' +', ' ',
@@ -79,24 +81,33 @@ class PcapRemoteSniffer(PcapFileSniffer):
         return stdout == "0\n"
 
     def get_packets(self, filter, tmp_dir):
-        transfer_path = "/tmp/brorig_transfer.pcap"
+        transfer_path = "/tmp/brorig_transfer_{0!s}.pcap".format(base64.b32encode(uuid.uuid4().bytes)[:26])
         local_path = os.path.join(tmp_dir, "log/pcap/")
         # Shrink the pcap trace base on the filter
         log.debug("Shrink the pcap file based on filters")
         t_start = filter['time']['start'].strftime("%Y-%m-%d %X")
         t_stop = filter['time']['stop'].strftime("%Y-%m-%d %X")
-        shrink_cmd = 'sudo editcap -v -A "%s" -B "%s" %s %s > /dev/null 2> /dev/null' % (
-            t_start, t_stop, self.remote_file_path, transfer_path)
+        shrink_cmd = 'sudo editcap -v -A "{start}" -B "{stop}" {f_remote} {t_path} > /dev/null 2> /dev/null'.format(
+            start=t_start,
+            stop=t_stop,
+            f_remote=self.remote_file_path,
+            t_path=transfer_path)
         connectivity.Script.remote_exe(self.server.ssh_connection, shrink_cmd)
         # Download the trace to the server directory
         log.debug("Download pcap trace shrinked")
         if not os.path.exists(local_path):
             os.makedirs(local_path)
         local_path = os.path.join(local_path,
-                                  '%s-%s.pcap' % (filter['time']['stop'].strftime("%Y-%m-%dT%X"), self.server.key))
+                                  '{time}-{server}.pcap'.format(
+                                      time=filter['time']['stop'].strftime("%Y-%m-%dT%X"),
+                                      server=self.server.key))
         self.server.ssh_connection.open_ssh_connexion()
         trans = connectivity.Transfer(self.server.ssh_connection.transport)
         trans.get(transfer_path, local_path)
+        # Remove transfer file
+        rm_transfer_path_cmd = "sudo rm -rf {file}".format(file=transfer_path)
+        connectivity.Script.remote_exe(self.server.ssh_connection, rm_transfer_path_cmd)
+        # Close the connection
         self.server.ssh_connection.close_ssh_connexion()
         # Read the trace
         log.debug("Read pcap trace")
