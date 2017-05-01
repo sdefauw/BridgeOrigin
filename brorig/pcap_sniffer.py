@@ -93,6 +93,9 @@ class PcapRemoteSniffer(PcapFileSniffer):
             f_remote=self.remote_file_path,
             t_path=transfer_path)
         connectivity.Script.remote_exe(self.server.ssh_connection, shrink_cmd)
+        # Change file permission to allow transfer on no sudo user
+        connectivity.Script.remote_exe(self.server.ssh_connection,
+                                       "sudo chmod 644 {}".format(transfer_path))
         # Download the trace to the server directory
         log.debug("Download pcap trace shrinked")
         if not os.path.exists(local_path):
